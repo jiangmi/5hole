@@ -27,11 +27,11 @@ M_PI = math.pi
                   
 #####################################
 def compute_Aw_main(ANi,ACu,epCu,epNi,tpd,tpp,tz,pds,pdp,pps,ppp,Upp,\
-                    d_Ni_double,d_Cu_double,p_double,double_Ni_part,hole34_Ni_part, double_Cu_part,\
-                    hole34_Cu_part, idx_Ni,idx_Cu, U_Ni, \
+                    d_Ni_double,d_Cu_double,p_double,double_Ni_part,hole345_Ni_part, double_Cu_part,\
+                    hole345_Cu_part, idx_Ni,idx_Cu, U_Ni, \
                     S_Ni_val, Sz_Ni_val, AorB_Ni_sym, \
                     U_Cu, S_Cu_val, Sz_Cu_val, AorB_Cu_sym):  
-    if Norb==7:
+    if Norb==7 or Norb==4:
         fname = 'epCu'+str(epCu)+'epNi'+str(epNi)+'_tpd'+str(tpd)+'_tpp'+str(tpp) \
                   +'_Mc'+str(Mc)+'_Norb'+str(Norb)+'_eta'+str(eta) +'_ANi'+str(ANi) \
                   + '_ACu'+str(ACu) + '_B'+str(B) + '_C'+str(C) +'_tz' +str(tz)                  
@@ -77,9 +77,9 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,tpd,tpp,tz,pds,pdp,pps,ppp,Upp,\
     
 
     if Norb==4 or Norb==7 or Norb==9 or Norb==10 or Norb==11:     
-        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,p_double,double_Ni_part, idx_Ni, hole34_Ni_part,  \
+        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,p_double,double_Ni_part, idx_Ni, hole345_Ni_part,  \
                                                       S_Ni_val, Sz_Ni_val,AorB_Ni_sym, ACu, ANi, Upp)
-        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,p_double,double_Cu_part, idx_Cu, hole34_Cu_part, \
+        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,p_double,double_Cu_part, idx_Cu, hole345_Cu_part, \
                                                       S_Cu_val, Sz_Cu_val,AorB_Cu_sym, ACu, ANi, Upp)        
         
         if pam.if_H0_rotate_byU==1:
@@ -157,17 +157,17 @@ if __name__ == '__main__':
     VS = vs.VariationalSpace(Mc)
 #     basis.count_VS(VS)
     
-    d_Ni_double, idx_Ni, hole34_Ni_part,  double_Ni_part, \
-    d_Cu_double, idx_Cu, hole34_Cu_part,  double_Cu_part, \
+    d_Ni_double, idx_Ni, hole345_Ni_part,  double_Ni_part, \
+    d_Cu_double, idx_Cu, hole345_Cu_part,  double_Cu_part, \
     p_double = ham.get_double_occu_list(VS)
     
     # change the basis for d_double states to be singlet/triplet
     U_Ni,S_Ni_val, Sz_Ni_val, AorB_Ni_sym,\
                                     =  basis.create_singlet_triplet_basis_change_matrix \
-                                    (VS, double_Ni_part, idx_Ni, hole34_Ni_part,d_Ni_double, d_Cu_double, 'Ni')
+                                    (VS, double_Ni_part, idx_Ni, hole345_Ni_part,d_Ni_double, d_Cu_double, 'Ni')
     U_Cu,S_Cu_val, Sz_Cu_val, AorB_Cu_sym,\
                                     =  basis.create_singlet_triplet_basis_change_matrix \
-                                    (VS, double_Cu_part, idx_Cu, hole34_Cu_part,d_Ni_double, d_Cu_double, 'Cu')
+                                    (VS, double_Cu_part, idx_Cu, hole345_Cu_part,d_Ni_double, d_Cu_double, 'Cu')
         
     if pam.if_print_VS_after_basis_change==1:
         basis.print_VS_after_basis_change(VS,S_val,Sz_val)
@@ -198,8 +198,8 @@ if __name__ == '__main__':
                                                ' tpd=',tpd,' tpp=',tpp,' Upp=',Upp ,'tz=',tz)
 
                                         compute_Aw_main(ANi,ACu,epCu,epNi,tpd,tpp,tz,0,0,0,0,Upp,\
-                                                        d_Ni_double,d_Cu_double,p_double,double_Ni_part,hole34_Ni_part,\
-                                                        double_Cu_part,hole34_Cu_part, idx_Ni,idx_Cu, \
+                                                        d_Ni_double,d_Cu_double,p_double,double_Ni_part,hole345_Ni_part,\
+                                                        double_Cu_part,hole345_Cu_part, idx_Ni,idx_Cu, \
                                                         U_Ni, S_Ni_val, Sz_Ni_val, AorB_Ni_sym ,U_Cu, \
                                                         S_Cu_val, Sz_Cu_val, AorB_Cu_sym)  
     elif Norb==9 or Norb==10 or Norb==11:
