@@ -48,7 +48,7 @@ def find_singlet_triplet_partner_d_double(VS, d_part, index, h345_part):
     return VS.get_index(partner_state), phase
 
 
-def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_part, idx, hole34_part):
+def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_part, idx, hole345_part):
     '''
     Similar to above create_singlet_triplet_basis_change_matrix but only applies
     basis change for d_double states
@@ -176,7 +176,7 @@ def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_par
 
             else:
                 if double_id not in count_list:
-                    j, ph = find_singlet_triplet_partner_d_double(VS, double_part[i], idx[i], hole34_part[i])
+                    j, ph = find_singlet_triplet_partner_d_double(VS, double_part[i], idx[i], hole345_part[i])
 
                     # append matrix elements for singlet states
                     # convention: original state col i stores singlet and 
@@ -355,6 +355,7 @@ def create_singlet_triplet_basis_change_matrix(VS, double_part, idx, hole345_par
         
         # calculate singlet or triplet only if the layer exist two holes        
         if (not (N_Ni== N_u and N_Cu==N_d)) and (i not in d_double):
+#         if i not in d_double:            
             data.append(np.sqrt(2.0)); row.append(i); col.append(i)  
          
         

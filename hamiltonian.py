@@ -612,7 +612,7 @@ def create_tpd_nn_matrix(VS, tpd_nn_hop_dir, tpd_orbs, tpd_nn_hop_fac):
                     new_state,ph,_ = vs.make_state_canonical(tmp_state)
                     #new_state,ph = vs.make_state_canonical_old(tmp_state)
 
-                    o12 = tuple([orb5, dir_, o4])
+                    o12 = tuple([orb5, dir_, o5])
                     if o12 in tpd_keys:
                         set_matrix_element(row,col,data,new_state,i,VS,tpd_nn_hop_fac[o12]*ph)   
 
@@ -790,7 +790,7 @@ def create_tpp_nn_matrix(VS,tpp_nn_hop_fac):
                     new_state,ph,_ = vs.make_state_canonical(tmp_state)
                     #new_state,ph = vs.make_state_canonical_old(tmp_state)
 
-                    o12 = sorted([orb5, dir_, o4])
+                    o12 = sorted([orb5, dir_, o5])
                     o12 = tuple(o12)
                     if o12 in tpp_orbs:
                         set_matrix_element(row,col,data,new_state,i,VS,tpp_nn_hop_fac[o12]*ph)                             
@@ -936,7 +936,7 @@ def create_tz_matrix(VS,tz_fac):
         if orbs5 == ['NotOnSublattice']:
             continue
 
-        for o5 in orbs4:
+        for o5 in orbs5:
             if o5!=orb5:
                 continue
             

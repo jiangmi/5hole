@@ -257,7 +257,7 @@ def make_state_canonical(state):
                 tlabel = slabel2[0:5] + [s5,orb5,x5,y5,z5] 
                 tmp15, ph = reorder_state(tlabel)
                 phase *= ph                           
-                if tmp25 == tlabel:
+                if tmp15 == tlabel:
                     slabel3 = slabel2[0:5] + [s5,orb5,x5,y5,z5] + slabel2[5:20]     
                 else:
                     slabel3 = [s5,orb5,x5,y5,z5] + slabel2                       

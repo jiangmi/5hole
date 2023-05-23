@@ -64,7 +64,7 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,tpd,tpp,tz,pds,pdp,pps,ppp,Upp,\
     Esite  = ham.create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu)      
     
     H0 = T_pd + T_pp + T_z + Esite    
-    
+#     H0 = T_pd   
 
             
     '''
@@ -162,12 +162,21 @@ if __name__ == '__main__':
     p_double = ham.get_double_occu_list(VS)
     
     # change the basis for d_double states to be singlet/triplet
-    U_Ni,S_Ni_val, Sz_Ni_val, AorB_Ni_sym,\
-                                    =  basis.create_singlet_triplet_basis_change_matrix \
-                                    (VS, double_Ni_part, idx_Ni, hole345_Ni_part,d_Ni_double, d_Cu_double, 'Ni')
-    U_Cu,S_Cu_val, Sz_Cu_val, AorB_Cu_sym,\
-                                    =  basis.create_singlet_triplet_basis_change_matrix \
-                                    (VS, double_Cu_part, idx_Cu, hole345_Cu_part,d_Ni_double, d_Cu_double, 'Cu')
+    
+    if pam.basis_change_type =='all_states':
+        U_Ni,S_Ni_val, Sz_Ni_val, AorB_Ni_sym,\
+                                        =  basis.create_singlet_triplet_basis_change_matrix \
+                                        (VS, double_Ni_part, idx_Ni, hole345_Ni_part,d_Ni_double, d_Cu_double, 'Ni')
+        U_Cu,S_Cu_val, Sz_Cu_val, AorB_Cu_sym,\
+                                        =  basis.create_singlet_triplet_basis_change_matrix \
+                                        (VS, double_Cu_part, idx_Cu, hole345_Cu_part,d_Ni_double, d_Cu_double, 'Cu')
+
+    if pam.basis_change_type =='d_double':
+        U_Ni,S_Ni_val, Sz_Ni_val, AorB_Ni_sym,\
+                     =  basis.create_singlet_triplet_basis_change_matrix_d_double(VS, d_Ni_double, double_Ni_part, idx_Ni, hole345_Ni_part)
+        U_Cu,S_Cu_val, Sz_Cu_val, AorB_Cu_sym,\
+                     =  basis.create_singlet_triplet_basis_change_matrix_d_double(VS, d_Cu_double, double_Cu_part, idx_Cu, hole345_Cu_part)    
+    
         
     if pam.if_print_VS_after_basis_change==1:
         basis.print_VS_after_basis_change(VS,S_val,Sz_val)

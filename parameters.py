@@ -14,7 +14,7 @@ edCu = {'d3z2r2': 0.0,\
 edNi = edCu
 
 epNis = np.arange(7.00, 7.06, 10.0)
-epCus = np.arange(7.0, 7.76, 10.0)
+epCus = np.arange(7.00, 7.06, 10.0)
 
 ANis = np.arange(6.0, 6.01, 1.0)
 ACus = np.arange(6.0, 6.01, 1.0)
@@ -74,7 +74,7 @@ Lanczos_maxiter = 600
 reduce_VS = 1
 
 if_H0_rotate_byU = 1
-basis_change_type = 'all_states' # 'all_states' or 'd_double'
+basis_change_type = 'd_double' # 'all_states' or 'd_double'
 if_print_VS_after_basis_change = 0
 
 if_compute_Aw = 0

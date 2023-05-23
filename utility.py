@@ -140,35 +140,35 @@ def get_NiCu_layer_orbs(state):
         
         
     
-def get_statistic_orb(os):       
-    '''
-    get orb label, e.g. d9L or d9L2, for a given os = [01,02,...] (any length of os !!)
-    Assume that there is at least 1 hole, namely len(os)=1 or os is not empty
-    '''
-    Nos = len(os)
-    assert(Nos>0)
+# def get_statistic_orb(os):       
+#     '''
+#     get orb label, e.g. d9L or d9L2, for a given os = [01,02,...] (any length of os !!)
+#     Assume that there is at least 1 hole, namely len(os)=1 or os is not empty
+#     '''
+#     Nos = len(os)
+#     assert(Nos>0)
     
-    nNi_Cu = 0; nO = 0
-    dorbs=[]; porbs=[]
+#     nNi_Cu = 0; nO = 0
+#     dorbs=[]; porbs=[]
     
-    for i in range(Nos):
-        if os[i] in pam.Ni_Cu_orbs:
-            nNi_Cu += 1; dorbs.append(os[i])   
-        elif os[i] in pam.O_orbs:
-            nO += 1; porbs.append(os[i])
+#     for i in range(Nos):
+#         if os[i] in pam.Ni_Cu_orbs:
+#             nNi_Cu += 1; dorbs.append(os[i])   
+#         elif os[i] in pam.O_orbs:
+#             nO += 1; porbs.append(os[i])
         
     
-    if nNi_Cu==1:
-        label = 'd9'
-    elif nNi_Cu==2:
-        label = 'd8'
+#     if nNi_Cu==1:
+#         label = 'd9'
+#     elif nNi_Cu==2:
+#         label = 'd8'
         
-    if nO==1:
-        label = 'd9'
-    elif nO==2:
-        label = 'd10'
+#     if nO==1:
+#         label = 'd9'
+#     elif nO==2:
+#         label = 'd10'
     
-    return nNi_Cu, nO, dorbs, porbs
+#     return nNi_Cu, nO, dorbs, porbs
 
 
 def get_orb_edep(orb,z,epCu,epNi):
