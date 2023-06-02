@@ -40,12 +40,12 @@ tpp_nn_hop_dir = ['UR','UL','DL','DR']
 def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
     # dxz and dyz has no tpd hopping
     
-    if pam.Norb==7 or pam.Norb==4:
+    if pam.Norb==8 or pam.Norb==5:
         tpd_nn_hop_dir = {'d3z2r2': ['L','R','U','D'],\
                           'dx2y2' : ['L','R','U','D'],\
                           'px'    : ['L','R'],\
                           'py'    : ['U','D']}
-    elif pam.Norb==9 or pam.Norb==10 :
+    elif pam.Norb==10 or pam.Norb==11 :
         tpd_nn_hop_dir = {'d3z2r2': ['L','R','U','D'],\
                           'dx2y2' : ['L','R','U','D'],\
                           'dxy'   : ['L','R','U','D'],\
@@ -53,7 +53,7 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
                           'py1'   : ['L','R'],\
                           'px2'   : ['U','D'],\
                           'py2'   : ['U','D']}
-    elif pam.Norb==11 :
+    elif pam.Norb==12 :
         tpd_nn_hop_dir = {'d3z2r2': ['L','R','U','D'],\
                           'dx2y2' : ['L','R','U','D'],\
                           'dxy'   : ['L','R','U','D'],\
@@ -66,11 +66,11 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
                           'py2'   : ['U','D'],\
                           'pz2'   : ['U','D']}
         
-    if pam.Norb==7 or pam.Norb==4:
+    if pam.Norb==8 or pam.Norb==5:
         tpd_orbs = {'d3z2r2','dx2y2','px','py'}
-    elif pam.Norb==9:
+    elif pam.Norb==10:
         tpd_orbs = {'d3z2r2','dx2y2','dxy','px1','py1','px2','py2'}
-    elif pam.Norb==11:
+    elif pam.Norb==12:
         tpd_orbs = {'d3z2r2','dx2y2','dxy','dxz','dyz','px1','py1','pz1','px2','py2','pz2'}
         
     # hole language: sign convention followed from Fig 1 in H.Eskes's PRB 1990 paper
@@ -79,7 +79,7 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
     # dx2-y2 hoping to the O px in the positive x direction should be positive for electrons and for O in the minus x
     # directions should be negative for electrons, i.e. the hoping integral should be minus sign of overlap integral
     # between two neighboring atoms. 
-    if pam.Norb==7 or pam.Norb==4:
+    if pam.Norb==8 or pam.Norb==5:
         # d3z2r2 has +,-,+ sign structure so that it is - in x-y plane
         tpd_nn_hop_fac = {('d3z2r2','L','px'): -tpd/np.sqrt(3),\
                           ('d3z2r2','R','px'):  tpd/np.sqrt(3),\
@@ -98,7 +98,7 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
                           ('px','L','dx2y2'):  -tpd,\
                           ('py','D','dx2y2'):   tpd,\
                           ('py','U','dx2y2'):  -tpd}
-    elif pam.Norb==9:
+    elif pam.Norb==10:
         c = np.sqrt(3)/2.0
         tpd_nn_hop_fac = {('d3z2r2','L','px1'): -pds/2.0,\
                           ('d3z2r2','R','px1'):  pds/2.0,\
@@ -125,7 +125,7 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
                           ('py1','L','dxy'):   pdp,\
                           ('px2','D','dxy'):   pdp,\
                           ('px2','U','dxy'):  -pdp}
-    elif pam.Norb==11:
+    elif pam.Norb==12:
         c = np.sqrt(3)/2.0
         tpd_nn_hop_fac = {('d3z2r2','L','px1'): -pds/2.0,\
                           ('d3z2r2','R','px1'):  pds/2.0,\
@@ -161,12 +161,12 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
                           ('pz2','D','dyz'):   pdp,\
                           ('pz2','U','dyz'):  -pdp}
     ########################## tpp below ##############################
-    if pam.Norb==7 or pam.Norb==4:
+    if pam.Norb==8 or pam.Norb==5:
         tpp_nn_hop_fac = {('UR','px','py'): -tpp,\
                           ('UL','px','py'):  tpp,\
                           ('DL','px','py'): -tpp,\
                           ('DR','px','py'):  tpp}
-    elif pam.Norb==9:
+    elif pam.Norb==10:
         tpp_nn_hop_fac = {('UR','px1','px2'):  0.5*(ppp-pps),\
                           ('UL','px1','px2'):  0.5*(ppp-pps),\
                           ('DL','px1','px2'):  0.5*(ppp-pps),\
@@ -183,7 +183,7 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
                           ('UL','px2','py1'):  0.5*(ppp+pps),\
                           ('DL','px2','py1'): -0.5*(ppp+pps),\
                           ('DR','px2','py1'):  0.5*(ppp+pps)}
-    elif pam.Norb==11:
+    elif pam.Norb==12:
         tpp_nn_hop_fac = {('UR','px1','px2'):  0.5*(ppp-pps),\
                           ('UL','px1','px2'):  0.5*(ppp-pps),\
                           ('DL','px1','px2'):  0.5*(ppp-pps),\
@@ -207,9 +207,26 @@ def set_tpd_tpp(Norb,tpd,tpp,pds,pdp,pps,ppp):
         
     return tpd_nn_hop_dir, tpd_orbs, tpd_nn_hop_fac, tpp_nn_hop_fac
 
+
+def set_tpzd(Norb,tpzd): 
+    if pam.Norb==5:    
+        tpzd_nn_hop_dir = {'d3z2r2': ['T','B'],\
+                          'pz': ['T','B']}
+
+        tpzd_orbs = {'d3z2r2','pz'}
+        tpzd_nn_hop_fac = {('d3z2r2','T','pz'): -tpzd,\
+                          ('d3z2r2','B','pz'): tpzd,\
+                          # below just inverse dir of the above one by one
+                          ('pz','B','d3z2r2'): -tpzd,\
+                          ('pz','T','d3z2r2'): tpzd}
+
+                      
+    return tpzd_nn_hop_dir, tpzd_orbs, tpzd_nn_hop_fac
+    
+
 def set_tz(Norb,if_tz_exist,tz):                            #条件Ni向下
     
-    if pam.Norb==4:
+    if pam.Norb==5:
         if if_tz_exist == 0: 
             tz_fac ={('px','px'):  tz,\
                      ('py','py'):  tz,\
@@ -222,7 +239,7 @@ def set_tz(Norb,if_tz_exist,tz):                            #条件Ni向下
             tz_fac ={('d3z2r2','d3z2r2'):  1.2*tz}        
     
     
-    if pam.Norb==7:
+    if pam.Norb==8:
         if if_tz_exist == 0: 
             tz_fac ={('px','px'):  tz,\
                      ('py','py'):  tz,\
@@ -237,7 +254,7 @@ def set_tz(Norb,if_tz_exist,tz):                            #条件Ni向下
             tz_fac ={('d3z2r2','d3z2r2'):  1.2*tz}               
             
             
-    if pam.Norb==9:
+    if pam.Norb==10:
         tz_fac ={('px1','px1'):  tz,\
                  ('px2','px2'):  tz,\
                  ('py1','py1'):  tz,\
@@ -842,7 +859,7 @@ def create_tz_matrix(VS,tz_fac):
         x5, y5, z5 = start_state['hole5_coord']          
 
         # hole 1 hops: some d-orbitals might have no tpd
-        orbs1 = lat.get_unit_cell_rep(x1, y1, 1-z1)
+        orbs1 = lat.get_unit_cell_rep(x1, y1, 2-z1)
         if orbs1 == ['NotOnSublattice']:
             continue
 
@@ -854,7 +871,7 @@ def create_tz_matrix(VS,tz_fac):
             o12 = [o1,orb1]
             o12 = tuple(o12)
             if o12 in tz_orbs:
-                slabel = [s1,o1,x1,y1,1-z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+                slabel = [s1,o1,x1,y1,2-z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
                 # consider Pauli principle
                 if not vs.check_Pauli(slabel):
                     continue 
@@ -865,7 +882,7 @@ def create_tz_matrix(VS,tz_fac):
                 set_matrix_element(row,col,data,new_state,i,VS,tz_fac[o12]*ph)
 
         # hole 2 hops; some d-orbitals might have no tpd
-        orbs2 = lat.get_unit_cell_rep(x2, y2, 1-z2)
+        orbs2 = lat.get_unit_cell_rep(x2, y2, 2-z2)
         if orbs2 == ['NotOnSublattice']:
             continue
 
@@ -877,7 +894,7 @@ def create_tz_matrix(VS,tz_fac):
             o12 = [o2,orb2]
             o12 = tuple(o12)
             if o12 in tz_orbs:
-                slabel = [s1,orb1,x1,y1,z1,s2,o2,x2,y2,1-z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+                slabel = [s1,orb1,x1,y1,z1,s2,o2,x2,y2,2-z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
                 # consider Pauli principle
                 if not vs.check_Pauli(slabel):
                     continue 
@@ -888,7 +905,7 @@ def create_tz_matrix(VS,tz_fac):
                 set_matrix_element(row,col,data,new_state,i,VS,tz_fac[o12]*ph)
  
         # hole 3 hops; some d-orbitals might have no tpd
-        orbs3 = lat.get_unit_cell_rep(x3, y3, 1-z3)
+        orbs3 = lat.get_unit_cell_rep(x3, y3, 2-z3)
         if orbs3 == ['NotOnSublattice']:
             continue
 
@@ -899,7 +916,7 @@ def create_tz_matrix(VS,tz_fac):
             o12 = [o3,orb3]
             o12 = tuple(o12)
             if o12 in tz_orbs:
-                slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,o3,x3,y3,1-z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+                slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,o3,x3,y3,2-z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
                 # consider Pauli principle
                 if not vs.check_Pauli(slabel):
                     continue                 
@@ -910,7 +927,7 @@ def create_tz_matrix(VS,tz_fac):
                 set_matrix_element(row,col,data,new_state,i,VS,tz_fac[o12]*ph)
                 
         # hole 4 hops; some d-orbitals might have no tpd
-        orbs4 = lat.get_unit_cell_rep(x4, y4, 1-z4)
+        orbs4 = lat.get_unit_cell_rep(x4, y4, 2-z4)
         if orbs4 == ['NotOnSublattice']:
             continue
 
@@ -921,7 +938,7 @@ def create_tz_matrix(VS,tz_fac):
             o12 = [o4,orb4]
             o12 = tuple(o12)
             if o12 in tz_orbs:
-                slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,o4,x4,y4,1-z4,s5,orb5,x5,y5,z5]
+                slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,o4,x4,y4,2-z4,s5,orb5,x5,y5,z5]
                 # consider Pauli principle
                 if not vs.check_Pauli(slabel):
                     continue                 
@@ -932,7 +949,7 @@ def create_tz_matrix(VS,tz_fac):
                 set_matrix_element(row,col,data,new_state,i,VS,tz_fac[o12]*ph)    
                 
         # hole 5 hops; some d-orbitals might have no tpd
-        orbs5 = lat.get_unit_cell_rep(x5, y5, 1-z5)
+        orbs5 = lat.get_unit_cell_rep(x5, y5, 2-z5)
         if orbs5 == ['NotOnSublattice']:
             continue
 
@@ -943,7 +960,7 @@ def create_tz_matrix(VS,tz_fac):
             o12 = [o5,orb5]
             o12 = tuple(o12)
             if o12 in tz_orbs:
-                slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,o5,x5,y5,1-z5]
+                slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,o5,x5,y5,2-z5]
                 # consider Pauli principle
                 if not vs.check_Pauli(slabel):
                     continue                 
@@ -966,7 +983,206 @@ def create_tz_matrix(VS,tz_fac):
     return out
 
    
-def create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu):
+
+def create_tpzd_nn_matrix(VS, tpzd_nn_hop_dir, tpzd_orbs, tpzd_nn_hop_fac):
+    '''
+    Create nearest neighbor (NN) pd hopping part of the Hamiltonian
+    Only hole can hop with tpzd
+
+    Parameters
+    ----------
+    VS: VariationalSpace class from the module variationalSpace
+    
+    Returns
+    -------
+    matrix: (sps coo format) t_pd hopping part of the Hamiltonian without 
+        the prefactor t_pd.
+    
+    Note from the sps documentation
+    -------------------------------
+    By default when converting to CSR or CSC format, duplicate (i,j)
+    entries will be summed together
+    '''    
+    print ("start create_tpzd_nn_matrix")
+    print ("==========================")
+    
+    dim = VS.dim
+    tpzd_keys = tpzd_nn_hop_fac.keys()
+    data = []
+    row = []
+    col = []
+    for i in range(0,dim):
+        start_state = VS.get_state(VS.lookup_tbl[i])
+        
+        # double check which cost some time, might not necessary
+        assert VS.get_uid(start_state) == VS.lookup_tbl[i]
+        
+        s1 = start_state['hole1_spin']
+        s2 = start_state['hole2_spin']
+        s3 = start_state['hole3_spin']
+        s4 = start_state['hole4_spin']    
+        s5 = start_state['hole5_spin']         
+        orb1 = start_state['hole1_orb']
+        orb2 = start_state['hole2_orb']
+        orb3 = start_state['hole3_orb']
+        orb4 = start_state['hole4_orb']   
+        orb5 = start_state['hole5_orb']         
+        x1, y1, z1 = start_state['hole1_coord']
+        x2, y2, z2 = start_state['hole2_coord']
+        x3, y3, z3 = start_state['hole3_coord']   
+        x4, y4, z4 = start_state['hole4_coord']   
+        x5, y5, z5 = start_state['hole5_coord']           
+
+        # hole 1 hops: some d-orbitals might have no tpzd
+        if orb1 in tpzd_orbs:
+            for dir_ in tpzd_nn_hop_dir[orb1]:
+                vx, vy, vz = directions_to_vecs[dir_]
+                orbs1 = lat.get_unit_cell_rep(x1+vx, y1+vy, z1+vz)
+                if orbs1 == ['NotOnSublattice']:
+                    continue
+
+                if not vs.check_in_vs_condition1(x1+vx,y1+vy,x2,y2,x3,y3,x4,y4,x5,y5):
+                    continue
+
+                # consider t_pd for all cases; when up hole hops, dn hole should not change orb
+                for o1 in orbs1:
+                    if o1 not in tpzd_orbs:
+                        continue
+                        
+                    # consider Pauli principle
+                    slabel = [s1,o1,x1+vx,y1+vy,z1+vz,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]  
+                    if not vs.check_Pauli(slabel):
+                        continue 
+                        
+                    tmp_state = vs.create_state(slabel)
+                    new_state,ph,_ = vs.make_state_canonical(tmp_state)
+                    #new_state,ph = vs.make_state_canonical_old(tmp_state)
+
+                    o12 = tuple([orb1, dir_, o1])
+                    if o12 in tpzd_keys:
+                        set_matrix_element(row,col,data,new_state,i,VS,tpzd_nn_hop_fac[o12]*ph)
+
+        # hole 2 hops; some d-orbitals might have no tpzd
+        if orb2 in tpzd_orbs:
+            for dir_ in tpzd_nn_hop_dir[orb2]:
+                vx, vy, vz = directions_to_vecs[dir_]
+                orbs2 = lat.get_unit_cell_rep(x2+vx, y2+vy, z2+vz)
+                if orbs2 == ['NotOnSublattice']:
+                    continue
+
+                if not vs.check_in_vs_condition1(x1,y1,x2+vx,y2+vy,x3,y3,x4,y4,x5,y5):
+                    continue
+
+                for o2 in orbs2:
+                    if o2 not in tpzd_orbs:
+                        continue
+                        
+                    # consider Pauli principle
+                    slabel = [s1,orb1,x1,y1,z1,s2,o2,x2+vx,y2+vy,z2+vz,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+                    if not vs.check_Pauli(slabel):
+                        continue 
+                        
+                    tmp_state = vs.create_state(slabel)
+                    new_state,ph,_ = vs.make_state_canonical(tmp_state)
+                    #new_state,ph = vs.make_state_canonical_old(tmp_state)
+
+                    o12 = tuple([orb2, dir_, o2])
+                    if o12 in tpzd_keys:
+                        set_matrix_element(row,col,data,new_state,i,VS,tpzd_nn_hop_fac[o12]*ph)
+
+        if orb3 in tpzd_orbs:
+            for dir_ in tpzd_nn_hop_dir[orb3]:
+                vx, vy, vz = directions_to_vecs[dir_]
+                orbs3 = lat.get_unit_cell_rep(x3+vx, y3+vy, z3+vz)
+                if orbs3 == ['NotOnSublattice']:
+                    continue
+
+                if not vs.check_in_vs_condition1(x1,y1,x2,y2,x3+vx,y3+vy,x4,y4,x5,y5):
+                    continue
+
+                for o3 in orbs3:
+                    if o3 not in tpzd_orbs:
+                        continue
+                        
+                    # consider Pauli principle                   
+                    slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,o3,x3+vx,y3+vy,z3+vz,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+                    if not vs.check_Pauli(slabel):
+                        continue 
+                        
+                    tmp_state = vs.create_state(slabel)
+                    new_state,ph,_ = vs.make_state_canonical(tmp_state)
+                    #new_state,ph = vs.make_state_canonical_old(tmp_state)
+
+                    o12 = tuple([orb3, dir_, o3])
+                    if o12 in tpzd_keys:
+                        set_matrix_element(row,col,data,new_state,i,VS,tpzd_nn_hop_fac[o12]*ph)
+                        
+        if orb4 in tpzd_orbs:
+            for dir_ in tpzd_nn_hop_dir[orb4]:
+                vx, vy, vz = directions_to_vecs[dir_]
+                orbs4 = lat.get_unit_cell_rep(x4+vx, y4+vy, z4+vz)
+                if orbs4 == ['NotOnSublattice']:
+                    continue
+
+                if not vs.check_in_vs_condition1(x1,y1,x2,y2,x3,y3,x4+vx,y4+vy,x5,y5):
+                    continue
+
+                for o4 in orbs4:
+                    if o4 not in tpzd_orbs:
+                        continue
+                        
+                    # consider Pauli principle                    
+                    slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,o4,x4+vx,y4+vy,z4+vz,s5,orb5,x5,y5,z5]
+                    if not vs.check_Pauli(slabel):
+                        continue  
+                        
+                    tmp_state = vs.create_state(slabel)
+                    new_state,ph,_ = vs.make_state_canonical(tmp_state)
+                    #new_state,ph = vs.make_state_canonical_old(tmp_state)
+
+                    o12 = tuple([orb4, dir_, o4])
+                    if o12 in tpzd_keys:
+                        set_matrix_element(row,col,data,new_state,i,VS,tpzd_nn_hop_fac[o12]*ph)
+                           
+        if orb5 in tpzd_orbs:
+            for dir_ in tpzd_nn_hop_dir[orb5]:
+                vx, vy, vz = directions_to_vecs[dir_]
+                orbs5 = lat.get_unit_cell_rep(x5+vx, y5+vy, z5+vz)
+                if orbs5 == ['NotOnSublattice']:
+                    continue
+
+                if not vs.check_in_vs_condition1(x1,y1,x2,y2,x3,y3,x4,y4,x5+vx, y5+vy):
+                    continue
+
+                for o5 in orbs5:
+                    if o5 not in tpzd_orbs:
+                        continue
+                        
+                    # consider Pauli principle                    
+                    slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,o5,x5+vx,y5+vy,z5+vz]
+                    if not vs.check_Pauli(slabel):
+                        continue  
+                        
+                    tmp_state = vs.create_state(slabel)
+                    new_state,ph,_ = vs.make_state_canonical(tmp_state)
+                    #new_state,ph = vs.make_state_canonical_old(tmp_state)
+
+                    o12 = tuple([orb5, dir_, o5])
+                    if o12 in tpzd_keys:
+                        set_matrix_element(row,col,data,new_state,i,VS,tpzd_nn_hop_fac[o12]*ph)   
+
+    row = np.array(row)
+    col = np.array(col)
+    data = np.array(data)
+    
+    # check if hoppings occur within groups of (up,up), (dn,dn), and (up,dn) 
+    #assert(check_spin_group(row,col,data,VS)==True)
+    out = sps.coo_matrix((data,(row,col)),shape=(dim,dim))
+    
+    return out
+
+    
+def create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu,epbilayer):
     '''
     Create diagonal part of the site energies
     '''    
@@ -991,14 +1207,14 @@ def create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu):
         x3, y3, z3 = state['hole3_coord']    
         x4, y4, z4 = state['hole4_coord'] 
         x5, y5, z5 = state['hole5_coord']         
+     
         
-        
-        diag_el += util.get_orb_edep(orb1,z1,epCu,epNi)
-        diag_el += util.get_orb_edep(orb2,z2,epCu,epNi)
-        diag_el += util.get_orb_edep(orb3,z3,epCu,epNi)
-        diag_el += util.get_orb_edep(orb4,z4,epCu,epNi)
-        diag_el += util.get_orb_edep(orb5,z5,epCu,epNi)        
-        
+        diag_el += util.get_orb_edep(orb1,z1,epCu,epNi,epbilayer)
+        diag_el += util.get_orb_edep(orb2,z2,epCu,epNi,epbilayer)
+        diag_el += util.get_orb_edep(orb3,z3,epCu,epNi,epbilayer)
+        diag_el += util.get_orb_edep(orb4,z4,epCu,epNi,epbilayer)
+        diag_el += util.get_orb_edep(orb5,z5,epCu,epNi,epbilayer)        
+
         data.append(diag_el); row.append(i); col.append(i)
 #         print (i, diag_el)
 
@@ -1018,6 +1234,8 @@ def create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu):
     out = sps.coo_matrix((data,(row,col)),shape=(dim,dim))
     
     return out
+        
+    
     
 def get_double_occu_list(VS):
     '''
@@ -1027,7 +1245,7 @@ def get_double_occu_list(VS):
     dim = VS.dim
     d_Ni_list = []; idx_Ni = []; hole345_Ni_part = []; double_Ni_part = [];  
     d_Cu_list = []; idx_Cu = []; hole345_Cu_part = []; double_Cu_part = []; 
-    p_list = []
+    p_list = []; pz_list = []
     
     for i in range(0,dim):
         state = VS.get_state(VS.lookup_tbl[i])
@@ -1050,101 +1268,117 @@ def get_double_occu_list(VS):
         # find out which two holes are on Ni/Cu
         # idx is to label which hole is not on Ni/Cu
         if (x1, y1, z1)==(x2, y2, z2):
-            if z1==1:
+            if z1==2:
                 util.get_double_append(i,345,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z1==0:
+            elif z1==0:
                 util.get_double_append(i,345,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)
-                
+            elif z1==1:
+                pz_list.append(i)                  
             
         if (x1, y1, z1)==(x3, y3, z3):
-            if z1==1:
+            if z1==2:
                 util.get_double_append(i,245,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z1==0:
+            elif z1==0:
                 util.get_double_append(i,245,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)                
-
+            elif z1==1:
+                pz_list.append(i)  
                     
         if (x1, y1, z1)==(x4, y4, z4):
-            if z1==1: 
+            if z1==2: 
                 util.get_double_append(i,235,s1,o1,x1,y1,z1,s4,o4,x4,y4,z4,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s5,o5,x5,y5,z5,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part,double_Ni_part)
-            if z1==0: 
+            elif z1==0: 
                 util.get_double_append(i,235,s1,o1,x1,y1,z1,s4,o4,x4,y4,z4,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part,double_Cu_part)  
-         
+            elif z1==1:
+                pz_list.append(i)           
         
         if (x2, y2, z2)==(x3, y3, z3):
-            if z2==1:            
+            if z2==2:            
                 util.get_double_append(i,145,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s1,o1,x1,y1,z1,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z2==0:            
+            elif z2==0:            
                 util.get_double_append(i,145,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s1,o1,x1,y1,z1,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)
-                
+            elif z1==2:
+                pz_list.append(i)                  
                 
         if (x2, y2, z2)==(x4, y4, z4):
-            if z2==1:
+            if z2==2:
                 util.get_double_append(i,135,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s5,o5,x5,y5,z5,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z2==0:
+            elif z2==0:
                 util.get_double_append(i,135,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part) 
-              
+            elif z1==2:
+                pz_list.append(i)                
                 
         if (x3, y3, z3)==(x4, y4, z4):
-            if z3==1:
+            if z3==2:
                 util.get_double_append(i,125,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s5,o5,x5,y5,z5,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z3==0:
+            elif z3==0:
                 util.get_double_append(i,125,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)
-                
+            elif z3==1:
+                pz_list.append(i)   
+
         if (x1, y1, z1)==(x5, y5, z5):
-            if z1==1:
+            if z1==2:
                 util.get_double_append(i,234,s1,o1,x1,y1,z1,s5,o5,x5,y5,z5,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z1==0:
+            elif z1==0:
                 util.get_double_append(i,234,s1,o1,x1,y1,z1,s5,o5,x5,y5,z5,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)     
-                
+            elif z1==1:
+                pz_list.append(i)            
+        
         if (x2, y2, z2)==(x5, y5, z5):
-            if z2==1:
+            if z2==2:
                 util.get_double_append(i,134,s2,o2,x2,y2,z2,s5,o5,x5,y5,z5,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z2==0:
+            elif z2==0:
                 util.get_double_append(i,134,s2,o2,x2,y2,z2,s5,o5,x5,y5,z5,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4,\
-                                   d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)        
+                                   d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)  
+            elif z2==1:
+                pz_list.append(i)                  
                 
         if (x3, y3, z3)==(x5, y5, z5):
-            if z3==1:
+            if z3==2:
                 util.get_double_append(i,124,s3,o3,x3,y3,z3,s5,o5,x5,y5,z5,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z3==0:
+            elif z3==0:
                 util.get_double_append(i,124,s3,o3,x3,y3,z3,s5,o5,x5,y5,z5,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,\
-                                   d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)            
+                                   d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)   
+            elif z3==1:
+                pz_list.append(i)                  
                 
         if (x4, y4, z4)==(x5, y5, z5):
-            if z4==1:
+            if z4==2:
                 util.get_double_append(i,123,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,\
                                    d_Ni_list,p_list,idx_Ni,hole345_Ni_part, double_Ni_part)
-            if z4==0:
+            elif z4==0:
                 util.get_double_append(i,123,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)            
-                                     
+            elif z4==1:
+                pz_list.append(i)  
+                
                 
     print ("len(d_Ni_list)", len(d_Ni_list))
     print ("len(d_Cu_list)", len(d_Cu_list))    
     print ("len(p_list)", len(p_list))
+    print ("len(pz_list)", len(pz_list))    
     print ("len(idx_Ni)", len(idx_Ni))
     print ("len(idx_Cu)", len(idx_Cu))
 
     
     return d_Ni_list, idx_Ni, hole345_Ni_part,  double_Ni_part, \
            d_Cu_list, idx_Cu, hole345_Cu_part, double_Cu_part, \
-           p_list
+           p_list,pz_list
 
 def create_interaction_matrix_ALL_syms(VS,d_double,p_double,double_part,idx,hole345_part , \
                                        S_val, Sz_val, AorB_sym,ACu, ANi, Upp):
@@ -1210,7 +1444,7 @@ def create_interaction_matrix_ALL_syms(VS,d_double,p_double,double_part,idx,hole
             o12 = sorted([o1,o2])
             o12 = tuple(o12)
                 
-            if z1==1:
+            if z1==2:
                 state_order, interaction_mat, Stot, Sz_set, AorB = get_interaction_mat(ANi, sym)
             elif z1==0:
                 state_order, interaction_mat, Stot, Sz_set, AorB = get_interaction_mat(ACu, sym)
@@ -1242,7 +1476,7 @@ def create_interaction_matrix_ALL_syms(VS,d_double,p_double,double_part,idx,hole
                 if o34==('dyz','dyz'):
                     idx2 -= 1
                     
-                if pam.Norb == 4:    
+                if pam.Norb == 5:    
                     if o34==('dyz','dyz') or o34==('dxz','dxz') or o34==('dxy','dxy') or o34==('d3z2r2','dxy') or o34==('dx2y2','dxy') or \
                       o34==('d3z2r2','dxz') or o34==('dx2y2','dxz') or o34==('dxy','dxz') or o34==('d3z2r2','dyz') or o34==('dx2y2','dyz') \
                       or o34==('dxy','dyz') or o34==('dxz','dyz'):
@@ -1296,11 +1530,6 @@ def create_interaction_matrix_ALL_syms(VS,d_double,p_double,double_part,idx,hole
                                 if AorB_sym[j]!=AorB:
                                     continue
 
-#                             if o1 in pam.Ni_Cu_orbs and o2 in pam.Ni_Cu_orbs and o3 in pam.Ni_Cu_orbs and o4 in pam.Ni_Cu_orbs:
-# #                                if s1=='up' and o1=='d3z2r2' and x1==y1==z1==0 and s2=='dn' and o2=='d3z2r2' and x2==y2==z2==0:
-#                                 print('slabel',slabel,idx[i],o34,s1,s2,idx1,idx2,val)
-#                                    print('------')
-#                                     print('slabel2',slabel2)
                                     
                             val = interaction_mat[idx1][idx2]
                             data.append(val); row.append(double_id); col.append(j)

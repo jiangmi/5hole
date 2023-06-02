@@ -16,8 +16,11 @@ edNi = edCu
 epNis = np.arange(7.00, 7.06, 10.0)
 epCus = np.arange(7.00, 7.06, 10.0)
 
+epbilayers = np.arange(7.00, 7.06, 10.0)
+
 ANis = np.arange(6.0, 6.01, 1.0)
 ACus = np.arange(6.0, 6.01, 1.0)
+
 
 B = 0.15
 C = 0.58
@@ -33,13 +36,14 @@ C = 0.58
 
 # IMPORTANT: keep all hoppings below positive to avoid confusion
 #            hopping signs are considered in dispersion separately
-Norb = 4
-if Norb==7 or Norb==4:
+Norb = 5
+if Norb==8 or Norb==5:
     #tpds = [0.00001]  # for check_CuO4_eigenvalues.py
     tpds = np.linspace(1.3, 1.3, num=1, endpoint=True) #[0.25]
+    tpzds = np.linspace(1.3, 1.3, num=1, endpoint=True) #[0.25]    
 #     tpds = [0.01]
     tpps = [0.55]
-elif Norb==9 or Norb==11:    
+elif Norb==10 or Norb==12:    
     # pdp = sqrt(3)/4*pds so that tpd(b2)=tpd(b1)/2: see Eskes's thesis and 1990 paper
     # the values of pds and pdp between papers have factor of 2 difference
     # here use Eskes's thesis Page 4
@@ -92,30 +96,35 @@ if if_get_ground_state==1:
     Neval = 10
 if_compute_Aw_dd_total = 0
 
-if Norb==7 or Norb==9 or Norb==11:
+if Norb==8 or Norb==10 or Norb==12:
     Ni_Cu_orbs = ['dx2y2','dxy','dxz','dyz','d3z2r2']
-elif Norb==4:
+elif Norb==5:
     Ni_Cu_orbs = ['dx2y2','d3z2r2']    
     
-if Norb==7 or Norb==4:
+if Norb==8 or Norb==5:
     O1_orbs  = ['px']
     O2_orbs  = ['py']
-elif Norb==9:
+    Obilayer_orbs  = ['pz']    
+elif Norb==10:
     O1_orbs  = ['px1','py1']
     O2_orbs  = ['px2','py2']
-elif Norb==11:
+    Obilayer_orbs  = ['pz']      
+elif Norb==12:
     O1_orbs  = ['px1','py1','pz1']
     O2_orbs  = ['px2','py2','pz2']
+    Obilayer_orbs  = ['pz']      
 O_orbs = O1_orbs + O2_orbs
 # sort the list to facilliate the setup of interaction matrix elements
 Ni_Cu_orbs.sort()
 O1_orbs.sort()
 O2_orbs.sort()
 O_orbs.sort()
+Obilayer_orbs.sort()
 print ("Ni_Cu_orbs = ", Ni_Cu_orbs)
 print ("O1_orbs = ",  O1_orbs)
 print ("O2_orbs = ",  O2_orbs)
-orbs = Ni_Cu_orbs + O_orbs 
+print ("Obilayer_orbs = ",  Obilayer_orbs)
+orbs = Ni_Cu_orbs + O_orbs + Obilayer_orbs
 #assert(len(orbs)==Norb)
 
 Upps = [0]

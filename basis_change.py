@@ -1,3 +1,4 @@
+import time
 import variational_space as vs
 import lattice as lat
 import bisect
@@ -61,7 +62,7 @@ def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_par
     data = []
     row = []
     col = []
-    
+    start_time = time.time()    
     count_singlet = 0
     count_triplet = 0
     
@@ -201,7 +202,7 @@ def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_par
                     count_singlet += 1
                     count_triplet += 1
                
-
+    print("basis %s seconds ---" % (time.time() - start_time))
     return sps.coo_matrix((data,(row,col)),shape=(VS.dim,VS.dim))/np.sqrt(2.0), S_d8_val, Sz_d8_val, AorB_d8_sym
 
 
@@ -276,6 +277,7 @@ def find_singlet_triplet_partner(VS, Ni_layer, Cu_layer, NiorCu, i, Ni_i, Cu_i):
     tmp_state = vs.create_state(slabel)
     partner_state, phase, _ = vs.make_state_canonical(tmp_state)
 #     print(i,slabel,phase)
+
     return VS.get_index(partner_state), phase
 
 
@@ -350,7 +352,7 @@ def create_singlet_triplet_basis_change_matrix(VS, double_part, idx, hole345_par
             N_d = 2
             
         # get states in Ni and Cu layers separately and how many orbs
-        Ni_layer, N_Ni, Cu_layer, N_Cu, Ni_i, Cu_i = util.get_NiCu_layer_orbs(start_state)
+        Ni_layer, N_Ni, Cu_layer, N_Cu, Ni_i, Cu_i, pz_layer, N_pz, pz_i= util.get_NiCu_layer_orbs(start_state)
 
         
         # calculate singlet or triplet only if the layer exist two holes        

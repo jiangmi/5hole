@@ -38,7 +38,7 @@ def create_state(slabel):
     
     
     
-    
+#     print (slabel)
     assert(check_in_vs_condition1(x1,y1,x2,y2,x3,y3,x4,y4,x5,y5))
 
     state = {'hole1_spin' : s1,\
@@ -109,7 +109,7 @@ def reorder_state(slabel):
             elif s1=='dn' and s2=='up':
                 state_label = ['up',orb2,x2,y2,z2,'dn',orb1,x1,y1,z1]
                 phase = -1.0
-        elif z1==0 and z2==1:
+        elif z2>z1 :
             state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]
             phase = -1.0  
 
@@ -436,7 +436,7 @@ class VariationalSpace:
 
         for ux in range(-Mc,Mc+1):
             Bu = Mc - abs(ux)
-            funlist_u = [util.lamlist1(range(-Bu,Bu+1),[0,1])]
+            funlist_u = [util.lamlist1(range(-Bu,Bu+1),[0,1,2])]
             for f1_u in funlist_u[0]:
                 uy, uz = f1_u()    
                 orb1s = lat.get_unit_cell_rep(ux,uy,uz)
@@ -445,7 +445,7 @@ class VariationalSpace:
 
                 for vx in range(-Mc,Mc+1):
                     Bv = Mc - abs(vx)
-                    funlist_v = [util.lamlist1(range(-Bv,Bv+1),[0,1])]
+                    funlist_v = [util.lamlist1(range(-Bv,Bv+1),[0,1,2])]
                     for f1_v in funlist_v[0]:
                         vy, vz = f1_v()    
                         orb2s = lat.get_unit_cell_rep(vx,vy,vz)
@@ -456,7 +456,7 @@ class VariationalSpace:
 
                         for tx in range(-Mc,Mc+1):
                             Bt = Mc - abs(tx)
-                            funlist_t = [util.lamlist1(range(-Bt,Bt+1),[0,1])]
+                            funlist_t = [util.lamlist1(range(-Bt,Bt+1),[0,1,2])]
                             for f1_t in funlist_t[0]:
                                 ty, tz = f1_t() 
                                 orb3s = lat.get_unit_cell_rep(tx,ty,tz)
@@ -465,7 +465,7 @@ class VariationalSpace:
 
                                 for wx in range(-Mc,Mc+1):
                                     Bw = Mc - abs(wx)
-                                    funlist_w = [util.lamlist1(range(-Bw,Bw+1),[0,1])]
+                                    funlist_w = [util.lamlist1(range(-Bw,Bw+1),[0,1,2])]
                                     for f1_w in funlist_w[0]:
                                         wy, wz = f1_w() 
                                         orb4s = lat.get_unit_cell_rep(wx,wy,wz)
@@ -474,7 +474,7 @@ class VariationalSpace:
 
                                         for px in range(-Mc,Mc+1):
                                             Bp = Mc - abs(px)
-                                            funlist_p = [util.lamlist1(range(-Bp,Bp+1),[0,1])]
+                                            funlist_p = [util.lamlist1(range(-Bp,Bp+1),[0,1,2])]
                                             for f1_p in funlist_p[0]:
                                                 py, pz = f1_p() 
                                                 orb5s = lat.get_unit_cell_rep(px,py,pz)
@@ -631,8 +631,8 @@ class VariationalSpace:
         o4 = lat.orb_int[orb4]   
         o5 = lat.orb_int[orb5]         
 
-        uid =i1 + 2*i2 + 4*i3 + 8*i4 + 16*i5 + 32*z1 +64*z2 +128*z3 +256*z4 +512*z5 +1024*o1 +1024*N*o2 +1024*N2*o3 +1024*N3*o4 +1024*N4*o5 + 1024*N5*( (y1+s) + (x1+s)*B1 + (y2+s)*B2 + (x2+s)*B3 + (y3+s)*B4 + (x3+s)*B5 + (y4+s)*B6 + (x4+s)*B7 + (y5+s)*B8 + (x5+s)*B9)
-
+        uid =i1 + 2*i2 + 4*i3 + 8*i4 + 16*i5 + 32*z1 +96*z2 +288*z3 +864*z4 +2592*z5 +7776*o1 +7776*N*o2 +7776*N2*o3 +7776*N3*o4 +7776*N4*o5 + 7776*N5*( (y1+s) + (x1+s)*B1 + (y2+s)*B2 + (x2+s)*B3 + (y3+s)*B4 + (x3+s)*B5 + (y4+s)*B6 + (x4+s)*B7 + (y5+s)*B8 + (x5+s)*B9)
+#         print (state)
         # check if uid maps back to the original state, namely uid's uniqueness
         tstate = self.get_state(uid)
         ts1 = tstate['hole1_spin']
@@ -651,6 +651,7 @@ class VariationalSpace:
         tx4, ty4, tz4 = tstate['hole4_coord']
         tx5, ty5, tz5 = tstate['hole5_coord']        
         
+
         assert((s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5)== \
                (ts1,torb1,tx1,ty1,tz1,ts2,torb2,tx2,ty2,tz2,ts3,torb3,tx3,ty3,tz3,ts4,torb4,tx4,ty4,tz4,ts5,torb5,tx5,ty5,tz5))
             
@@ -677,44 +678,44 @@ class VariationalSpace:
         N5 = N4*N        
         
         
-        x5 = int(uid/(1024*N5*B9))- s 
-        uid_ = uid % (1024*N5*B9)
-        y5 = int(uid_/(1024*N5*B8))- s 
-        uid_ = uid_ % (1024*N5*B8)         
-        x4 = int(uid_/(1024*N5*B7))- s 
-        uid_ = uid_ % (1024*N5*B7)
-        y4 = int(uid_/(1024*N5*B6))- s 
-        uid_ = uid_ % (1024*N5*B6) 
-        x3 = int(uid_/(1024*N5*B5))- s 
-        uid_ = uid_ % (1024*N5*B5)
-        y3 = int(uid_/(1024*N5*B4))- s 
-        uid_ = uid_ % (1024*N5*B4) 
-        x2 = int(uid_/(1024*N5*B3))- s 
-        uid_ = uid_ % (1024*N5*B3)
-        y2 = int(uid_/(1024*N5*B2))- s  
-        uid_ = uid_ % (1024*N5*B2)
-        x1 = int(uid_/(1024*N5*B1))- s 
-        uid_ = uid_ % (1024*N5*B1)
-        y1 = int(uid_/(1024*N5)) - s
-        uid_ = uid_ % (1024*N5)
-        o5 = int(uid_/(1024*N4))
-        uid_ = uid_ % (1024*N4)         
-        o4 = int(uid_/(1024*N3))
-        uid_ = uid_ % (1024*N3)        
-        o3 = int(uid_/(1024*N2))
-        uid_ = uid_ % (1024*N2)
-        o2 = int(uid_/(1024*N))
-        uid_ = uid_ % (1024*N)
-        o1 = int(uid_/1024)
-        uid_ = uid_ % 1024
-        z5 = int(uid_/512)
-        uid_ = uid_ % 512          
-        z4 = int(uid_/256)
-        uid_ = uid_ % 256        
-        z3 = int(uid_/128)
-        uid_ = uid_ % 128
-        z2 = int( uid_/64)
-        uid_ = uid_ % 64
+        x5 = int(uid/(7776*N5*B9))- s 
+        uid_ = uid % (7776*N5*B9)
+        y5 = int(uid_/(7776*N5*B8))- s 
+        uid_ = uid_ % (7776*N5*B8)         
+        x4 = int(uid_/(7776*N5*B7))- s 
+        uid_ = uid_ % (7776*N5*B7)
+        y4 = int(uid_/(7776*N5*B6))- s 
+        uid_ = uid_ % (7776*N5*B6) 
+        x3 = int(uid_/(7776*N5*B5))- s 
+        uid_ = uid_ % (7776*N5*B5)
+        y3 = int(uid_/(7776*N5*B4))- s 
+        uid_ = uid_ % (7776*N5*B4) 
+        x2 = int(uid_/(7776*N5*B3))- s 
+        uid_ = uid_ % (7776*N5*B3)
+        y2 = int(uid_/(7776*N5*B2))- s  
+        uid_ = uid_ % (7776*N5*B2)
+        x1 = int(uid_/(7776*N5*B1))- s 
+        uid_ = uid_ % (7776*N5*B1)
+        y1 = int(uid_/(7776*N5)) - s
+        uid_ = uid_ % (7776*N5)
+        o5 = int(uid_/(7776*N4))
+        uid_ = uid_ % (7776*N4)         
+        o4 = int(uid_/(7776*N3))
+        uid_ = uid_ % (7776*N3)        
+        o3 = int(uid_/(7776*N2))
+        uid_ = uid_ % (7776*N2)
+        o2 = int(uid_/(7776*N))
+        uid_ = uid_ % (7776*N)
+        o1 = int(uid_/7776)
+        uid_ = uid_ % 7776
+        z5 = int(uid_/2592)
+        uid_ = uid_ % 2592          
+        z4 = int(uid_/864)
+        uid_ = uid_ % 864        
+        z3 = int(uid_/288)
+        uid_ = uid_ % 288
+        z2 = int( uid_/96)
+        uid_ = uid_ % 96
         z1 = int(uid_/32)
         uid_ = uid_ % 32
         i5 = int(uid_/16)
@@ -738,6 +739,7 @@ class VariationalSpace:
         s5 = lat.int_spin[i5]  
         
         slabel = [s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+#         print (slabel)
         state = create_state(slabel)
             
         return state
