@@ -15,6 +15,7 @@ import parameters as pam
 import lattice as lat
 import variational_space as vs
 import hamiltonian as ham
+# import hamiltonian_d10_U_2 as ham
 import basis_change as basis
 import get_state as getstate
 import utility as util
@@ -26,15 +27,15 @@ start_time = time.time()
 M_PI = math.pi
                   
 #####################################
-def compute_Aw_main(ANi,ACu,epCu,epNi,es,tpd,tpp,tds,tps,tza1,tzb1,pds,pdp,pps,ppp,Upp,\
-                    d_Ni_double,d_Cu_double,p_double,s_double,double_Ni_part,hole34_Ni_part, double_Cu_part,\
+def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tpzd,tz_a1a1,tz_b1b1,pds,pdp,pps,ppp,Upp,\
+                    d_Ni_double,d_Cu_double,p_double,apz_double,double_Ni_part,hole34_Ni_part, double_Cu_part,\
                     hole34_Cu_part, idx_Ni,idx_Cu, U_Ni, \
                     S_Ni_val, Sz_Ni_val, AorB_Ni_sym, \
                     U_Cu, S_Cu_val, Sz_Cu_val, AorB_Cu_sym):  
     if Norb==8 or Norb==5:
         fname = 'epCu'+str(epCu)+'epNi'+str(epNi)+'_tpd'+str(tpd)+'_tpp'+str(tpp) \
                   +'_Mc'+str(Mc)+'_Norb'+str(Norb)+'_eta'+str(eta) +'_ANi'+str(ANi) \
-                  + '_ACu'+str(ACu) + '_B'+str(B) + '_C'+str(C)                   
+                  + '_ACu'+str(ACu) + '_B'+str(B) + '_C'+str(C) +'_tz_a1a1' +str(tz_a1a1)  +'_tz_b1b1' +str(tz_b1b1)                 
         flowpeak = 'Norb'+str(Norb)+'_tpp'+str(tpp)+'_Mc'+str(Mc)+'_eta'+str(eta)
     elif Norb==10 or Norb==11 or Norb==12:
         fname = 'epCu'+str(epCu)+'epNi'+str(epNi)+'_pdp'+str(pdp)+'_pps'+str(pps)+'_ppp'+str(ppp) \
@@ -57,26 +58,21 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,es,tpd,tpp,tds,tps,tza1,tzb1,pds,pdp,pps,p
                                    = ham.set_tpd_tpp(Norb,0,0,pds,pdp,pps,ppp)
         
     if Norb==5:  
-        tds_nn_hop_dir, tds_orbs, tds_nn_hop_fac, tps_nn_hop_dir, tps_orbs, tps_nn_hop_fac \
-                                   = ham.set_tds_tps(Norb,tds,tps)
+        tapzd_nn_hop_dir, tapzd_orbs, tapzd_nn_hop_fac\
+                                   = ham.set_tapzd(Norb,tapzd)        
+        
     
-#     tz_fac = ham.set_tz(Norb,if_tz_exist,tz)
-    
-    tz_fac = ham.set_tz(Norb,if_tz_exist,tza1,tzb1)
-    
-    
+    tz_fac = ham.set_tz(Norb,if_tz_exist,tz_a1a1,tz_b1b1)
+            
     T_pd   = ham.create_tpd_nn_matrix(VS,tpd_nn_hop_dir, tpd_orbs, tpd_nn_hop_fac)
     T_pp   = ham.create_tpp_nn_matrix(VS,tpp_nn_hop_fac)  
     T_z    = ham.create_tz_matrix(VS,tz_fac)
-
-    T_ds   = ham.create_tds_nn_matrix(VS, tds_nn_hop_dir, tds_orbs, tds_nn_hop_fac)
-    T_ps   = ham.create_tps_nn_matrix(VS, tps_nn_hop_dir, tps_orbs, tps_nn_hop_fac)    
+    T_apzd   = ham.create_tapzd_nn_matrix(VS,tapzd_nn_hop_dir, tapzd_orbs, tapzd_nn_hop_fac)
+    Esite  = ham.create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu,epbilayer)      
     
-    Esite  = ham.create_edepes_diag_matrix(VS,ANi,ACu,epNi,epCu,es)      
-    
-    H0 = T_pd + T_pp + T_ds + T_ps + T_z + Esite    
-    
-
+    H0 = T_pd + T_pp + T_z + T_apzd + Esite    
+#     H0 = T_pd   
+    print("H0 %s seconds ---" % (time.time() - start_time))   
             
     '''
     Below probably not necessary to do the rotation by multiplying U and U_d
@@ -88,9 +84,9 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,es,tpd,tpp,tds,tps,tza1,tzb1,pds,pdp,pps,p
     
 
     if Norb==5 or Norb==8 or Norb==10 or Norb==11 or Norb==12:     
-        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,p_double,s_double,double_Ni_part, idx_Ni, hole34_Ni_part,  \
+        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,p_double,apz_double,double_Ni_part, idx_Ni, hole34_Ni_part,  \
                                                       S_Ni_val, Sz_Ni_val,AorB_Ni_sym, ACu, ANi, Upp, Uss)
-        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,p_double,s_double,double_Cu_part, idx_Cu, hole34_Cu_part, \
+        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,p_double,apz_double,double_Cu_part, idx_Cu, hole34_Cu_part, \
                                                       S_Cu_val, Sz_Cu_val,AorB_Cu_sym, ACu, ANi, Upp, Uss)        
         
         if pam.if_H0_rotate_byU==1:
@@ -109,13 +105,16 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,es,tpd,tpp,tds,tps,tza1,tzb1,pds,pdp,pps,p
             
 #             H = U_other_d.dot(H.dot(U_other))
         
-        H.tocsr()
+        H_bond = U_bond_d.dot(H.dot(U_bond))  
+    
+    
+        H_bond.tocsr()
 
+        print("H %s seconds ---" % (time.time() - start_time))   
         ####################################################################################
         # compute GS only for turning on full interactions
         if pam.if_get_ground_state==1:
-            vals, vecs = gs.get_ground_state(H, VS, S_Ni_val,Sz_Ni_val,S_Cu_val,Sz_Cu_val)
-                
+            vals, vecs = gs.get_ground_state(H_bond, VS, S_Ni_val,Sz_Ni_val,S_Cu_val,Sz_Cu_val,bonding_val)
                 
 #             if Norb==8:
 #                 util.write_GS('Egs_'+flowpeak+'.txt',A,ep,tpd,vals[0])
@@ -157,23 +156,24 @@ if __name__ == '__main__':
     edNi = pam.edNi
     edCu = pam.edCu
 
-
     ANis = pam.ANis
     ACus = pam.ACus
     B  = pam.B
     C  = pam.C
     
-
+    tz_a1a1 = pam.tz_a1a1
+    tz_b1b1 = pam.tz_b1b1    
     
     if_tz_exist  = pam.if_tz_exist    
     
     # set up VS
     VS = vs.VariationalSpace(Mc)
 #     basis.count_VS(VS)
+    print("vs %s seconds ---" % (time.time() - start_time))      
     
     d_Ni_double, idx_Ni, hole34_Ni_part,  double_Ni_part, \
     d_Cu_double, idx_Cu, hole34_Cu_part,  double_Cu_part, \
-    p_double, s_double = ham.get_double_occu_list(VS)
+    p_double, apz_double = ham.get_double_occu_list(VS)
     
     # change the basis for d_double states to be singlet/triplet
     if pam.basis_change_type =='all_states':
@@ -188,9 +188,14 @@ if __name__ == '__main__':
         U_Ni,S_Ni_val, Sz_Ni_val, AorB_Ni_sym,\
                      =  basis.create_singlet_triplet_basis_change_matrix_d_double(VS, d_Ni_double, double_Ni_part, idx_Ni, hole34_Ni_part)
         U_Cu,S_Cu_val, Sz_Cu_val, AorB_Cu_sym,\
-                     =  basis.create_singlet_triplet_basis_change_matrix_d_double(VS, d_Cu_double, double_Cu_part, idx_Cu, hole34_Cu_part)    
-    print("basis %s seconds ---" % (time.time() - start_time))    
+                     =  basis.create_singlet_triplet_basis_change_matrix_d_double(VS, d_Cu_double, double_Cu_part, idx_Cu, hole34_Cu_part)
         
+    U_bond,bonding_val = basis.create_bonding_anti_bonding_basis_change_matrix(VS)                 
+        
+        
+    print("basis %s seconds ---" % (time.time() - start_time))    
+    
+ 
         
     if pam.if_print_VS_after_basis_change==1:
         basis.print_VS_after_basis_change(VS,S_val,Sz_val)
@@ -200,57 +205,33 @@ if __name__ == '__main__':
 #         print(U_Cu)    
     U_Ni_d = (U_Ni.conjugate()).transpose()
     U_Cu_d = (U_Cu.conjugate()).transpose()    
-    
+    U_bond_d = (U_bond.conjugate()).transpose()        
     
     # check if U if unitary
 #     util.checkU_unitary(U_Ni,U_Ni_d)
     
     if Norb==8 or Norb==5:
-         for tds in pam.tdss:
-            for tps in pam.tpss:
-                for tpd in pam.tpds:
+            for tpd in pam.tpds:
+                for tapzd in pam.tapzds:                
                     for epCu in pam.epCus:
-                        for epNi in pam.epNis:   
-                            for es in pam.ess: 
-                                for tza1 in pam.tza1s:
-                                    for tzb1 in pam.tzb1s:
-                                        for ANi in pam.ANis:
-                                            for ACu in pam.ACus:
-                    #                            util.get_atomic_d8_energy(ANi,B,C)
-                                                for tpp in pam.tpps:
-                                                    for Upp in pam.Upps:
-                                                        for Uss in pam.Upps:                    
-                                                            print ('===================================================')
-                                                            print ('ANi=',ANi, 'ACu=',ACu,'epCu=', epCu, 'epNi=',epNi,\
-                                                                   ' tpd=',tpd,' tpp=',tpp,' Upp=',Upp,' Uss=',Uss)
+                        for epNi in pam.epNis: 
+                            for epbilayer in pam.epbilayers:                         
+                                for ANi in pam.ANis:
+                                    for ACu in pam.ACus:
+            #                            util.get_atomic_d8_energy(ANi,B,C)
+                                        for tpp in pam.tpps:
+                                            for Upp in pam.Upps:
+                                                for Uss in pam.Usss:
+                                                    print ('===================================================')
+                                                    print ('ANi=',ANi, 'ACu=',ACu,'epCu=', epCu, 'epNi=',epNi,\
+                                                           ' tpd=',tpd,' tpp=',tpp,' Upp=',Upp ,'tz_a1a1=',tz_a1a1,'tz_b1b1=',tz_b1b1,'tapzd=',tapzd)
 
-                                                            compute_Aw_main(ANi,ACu,epCu,epNi,es,tpd,tpp,tds,tps,tza1,tzb1,0,0,0,0,Upp,\
-                                                                            d_Ni_double,d_Cu_double,p_double,s_double,double_Ni_part,hole34_Ni_part,\
-                                                                            double_Cu_part,hole34_Cu_part, idx_Ni,idx_Cu, \
-                                                                            U_Ni, S_Ni_val, Sz_Ni_val, AorB_Ni_sym ,U_Cu, \
-                                                                            S_Cu_val, Sz_Cu_val, AorB_Cu_sym)  
-    elif Norb==10 or Norb==11 or Norb==12:
-        pps = pam.pps
-        ppp = pam.ppp
-        for tza1 in pam.tza1s:
-            for tzb1 in pam.tzb1s:                        
-                for ii in range(0,len(pam.pdps)):
-                    pds = pam.pdss[ii]
-                    pdp = pam.pdps[ii]
-                    for epCu in pam.epCus:
-                        for epNi in pam.epNis:
-                            for ANi in pam.ANis: 
-                                for ACu in pam.ACus:
-        #                         util.get_atomic_d8_energy(ANi,B,C)
-                                    for Upp in pam.Upps:
-                                        print ('===================================================')
-                                        print ('ANi=',ANi, 'ACu=',ACu,'epCu=',epCu, 'epNi=',epNi,' pds=',pds,\
-                                               ' pdp=',pdp,' pps=',pps,' ppp=',ppp,' Upp=',Upp,'tz=',tz)
-                                        compute_Aw_main(ANi,ACu,epCu,epNi,es,0,0,tz,pds,pdp,pps,ppp,Upp,\
-                                                       d_Ni_double,d_Cu_double,p_double,double_Ni_part,hole34_Ni_part,\
-                                                       double_Cu_part,hole34_Cu_part,idx_Ni,idx_Cu,\
-                                                       U_Ni, S_Ni_val, Sz_Ni_val, AorB_Ni_sym ,U_Cu, \
-                                                        S_Cu_val, Sz_Cu_val, AorB_Cu_sym) 
+                                                    compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tapzd,tz_a1a1,tz_b1b1,0,0,0,0,Upp,\
+                                                                    d_Ni_double,d_Cu_double,p_double,apz_double,double_Ni_part,hole34_Ni_part,\
+                                                                    double_Cu_part,hole34_Cu_part, idx_Ni,idx_Cu, \
+                                                                    U_Ni, S_Ni_val, Sz_Ni_val, AorB_Ni_sym ,U_Cu, \
+                                                                    S_Cu_val, Sz_Cu_val, AorB_Cu_sym)  
+
 
                         
     print("--- %s seconds ---" % (time.time() - start_time))

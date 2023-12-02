@@ -18,24 +18,25 @@ edCu = {'d3z2r2': 0,\
         'dyz'   : 0.909}
 
 # 29.5GPa:
-edCu = {'d3z2r2': 0.095,\
-        'dx2y2' : 0,\
-        'dxy'   : 1.06,\
-        'dxz'   : 0.94,\
-        'dyz'   : 0.94}
+# edCu = {'d3z2r2': 0.095,\
+#         'dx2y2' : 0,\
+#         'dxy'   : 1.06,\
+#         'dxz'   : 0.94,\
+#         'dyz'   : 0.94}
 
 
 edNi = edCu
 
 epNis = np.arange(1.86, 1.861, 1.0)
-epbilayers = np.arange(1.86, 1.861, 1.0)
+epbilayers = epNis
+
 # 29.5GPa:
 # epNis = np.arange(3.23, 3.231, 1.0)
 
 epCus = epNis
 
 # 29.5GPa:
-epbilayers = np.arange(2.42, 2.421, 1.0)
+# epbilayers = np.arange(2.42, 2.421, 1.0)
 
 ANis = np.arange(6.0, 6.01, 1.0)
 ACus = ANis
@@ -57,23 +58,23 @@ C = 0.58
 Norb = 5
 if Norb==8 or Norb==5:
     #tpds = [0.00001]  # for check_CuO4_eigenvalues.py
-    tpds = np.linspace(1.3, 1.3, num=1, endpoint=True) #[0.25]
+    tpds = np.linspace(0.6, 0.6, num=1, endpoint=True) #[0.25]
 #     tpds = [0.01]
 
     # 29.5GPa:
-    tpds = np.linspace(1.58, 1.58, num=1, endpoint=True) #[0.25]
+#     tpds = np.linspace(1.8, 1.8, num=1, endpoint=True) #[0.25]
 
     tpps = [0.55]
 
     # 29.5GPa:
-    tpps = [0.35]
+#     tpps = [0.35]
     
-    tapzds = np.linspace(1.7, 1.7, num=1, endpoint=True)
-    tapzps = np.linspace(0, 0, num=1, endpoint=True)
+    tapzds = np.linspace(0, 2.4, num=25, endpoint=True)
+
     tz_a1a1 = 0.028
 
     # 29.5GPa:
-    tz_a1a1 = 0.044
+#     tz_a1a1 = 0.044
 
     tz_b1b1 = 0.047
 
@@ -166,6 +167,7 @@ orbs = Ni_Cu_orbs + O_orbs + Obilayer_orbs
 #assert(len(orbs)==Norb)
 
 Upps = [0]
+Usss = [0]
 symmetries = ['1A1','3B1','3B1','1A2','3A2','1E','3E']
 print ("compute A(w) for symmetries = ",symmetries)
 

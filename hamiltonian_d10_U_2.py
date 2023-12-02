@@ -1096,6 +1096,11 @@ def create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu,epbilayer):
         diag_el += util.get_orb_edep(orb2,z2,epCu,epNi,epbilayer)
         diag_el += util.get_orb_edep(orb3,z3,epCu,epNi,epbilayer)
         diag_el += util.get_orb_edep(orb4,z4,epCu,epNi,epbilayer)    
+        Ni_i,Cu_i = util.get_Number_NiCu(state)
+        if Ni_i == 0:
+            diag_el +=ANi/2
+        if Cu_i == 0:
+            diag_el +=ACu/2        
 
         data.append(diag_el); row.append(i); col.append(i)
 #         print (i, diag_el)
@@ -1281,9 +1286,9 @@ def create_interaction_matrix_ALL_syms(VS,d_double,p_double,apz_double,double_pa
             o12 = tuple(o12)
                 
             if z1==2:
-                state_order, interaction_mat, Stot, Sz_set, AorB = get_interaction_mat(ANi, sym)
+                state_order, interaction_mat, Stot, Sz_set, AorB = get_interaction_mat(ANi/2, sym)
             elif z1==0:
-                state_order, interaction_mat, Stot, Sz_set, AorB = get_interaction_mat(ACu, sym)
+                state_order, interaction_mat, Stot, Sz_set, AorB = get_interaction_mat(ACu/2, sym)
                 
             sym_orbs = state_order.keys()
             
