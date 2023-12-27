@@ -29,17 +29,18 @@ def reorder_z(slabel):
             state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]
         elif z2==z1 and orb1=='dx2y2' and orb2=='d3z2r2':
             state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]
-    elif orb1 in pam.O_orbs and orb2 in pam.Obilayer_orbs:
-        state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]            
-    elif orb1 in pam.Obilayer_orbs and orb2 in pam.Ni_Cu_orbs:
-        state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]             
+            
     elif orb1 in pam.O_orbs and orb2 in pam.Ni_Cu_orbs:
         state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]
         
     elif orb1 in pam.O_orbs and orb2 in pam.O_orbs:
         if z2>z1:
             state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]
-            
+    elif orb1 in pam.O_orbs and orb2 in pam.Obilayer_orbs:
+        state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1]            
+    elif orb1 in pam.Obilayer_orbs and orb2 in pam.Ni_Cu_orbs:
+        state_label = [s2,orb2,x2,y2,z2,s1,orb1,x1,y1,z1] 
+        
     return state_label
                 
 def make_z_canonical(slabel):
@@ -48,6 +49,7 @@ def make_z_canonical(slabel):
     s2 = slabel[5]; orb2 = slabel[6]; x2 = slabel[7]; y2 = slabel[8]; z2 = slabel[9];
     s3 = slabel[10]; orb3 = slabel[11]; x3 = slabel[12]; y3 = slabel[13]; z3 = slabel[14];
     s4 = slabel[15]; orb4 = slabel[16]; x4 = slabel[17]; y4 = slabel[18]; z4 = slabel[19];    
+    s5 = slabel[20]; orb5 = slabel[21]; x5 = slabel[22]; y5 = slabel[23]; z5 = slabel[24];    
     '''
     For three holes, the original candidate state is c_1*c_2*c_3|vac>
     To generate the canonical_state:
@@ -83,7 +85,31 @@ def make_z_canonical(slabel):
             elif  tmp14 != tlabel:
                 slabel2 = [s4,orb4,x4,y4,z4] + slabel[0:15]     
                 
-    return slabel2
+    tlabel = slabel2[15:20] + [s5,orb5,x5,y5,z5]
+    tmp45 = reorder_z(tlabel)                
+    if tmp45 == tlabel:
+        slabel3 = slabel2 + [s5,orb5,x5,y5,z5]
+    else:
+        tlabel = slabel2[10:15] + [s5,orb5,x5,y5,z5] 
+        tmp35 = reorder_z(tlabel)                         
+        if tmp35 == tlabel:
+            slabel3 = slabel2[0:15] + [s5,orb5,x5,y5,z5] + slabel2[15:20]
+        else:
+            tlabel = slabel2[5:10] + [s5,orb5,x5,y5,z5] 
+            tmp25 = reorder_z(tlabel)                          
+            if tmp25 == tlabel:
+                slabel3 = slabel2[0:10] + [s5,orb5,x5,y5,z5] + slabel2[10:20]   
+            else:
+                tlabel = slabel2[0:5] + [s5,orb5,x5,y5,z5] 
+                tmp15 = reorder_z(tlabel)                          
+                if tmp15 == tlabel:
+                    slabel3 = slabel2[0:5] + [s5,orb5,x5,y5,z5] + slabel2[5:20]     
+                else:
+                    slabel3 = [s5,orb5,x5,y5,z5] + slabel2                       
+                        
+                
+                
+    return slabel3
 
 
 def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bonding_val):  
@@ -98,12 +124,12 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
 #     print ('H=')
 #     print (M_dense)
     
-#     for ii in range(0,1325):
-#         for jj in range(0,1325):
-#             if M_dense[ii,jj]>0 and ii!=jj:
-#                 print ii,jj,M_dense[ii,jj]
-#             if M_dense[ii,jj]==0 and ii==jj:
-#                 print ii,jj,M_dense[ii,jj]
+# #     for ii in range(0,1325):
+# #         for jj in range(0,1325):
+# #             if M_dense[ii,jj]>0 and ii!=jj:
+# #                 print (ii,jj,M_dense[ii,jj])
+# #             if M_dense[ii,jj]==0 and ii==jj:
+# #                 print (ii,jj,M_dense[ii,jj])
                     
                 
 #     vals, vecs = np.linalg.eigh(M_dense)
@@ -113,7 +139,7 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
     
     # in case eigsh works:
     Neval = pam.Neval
-    vals, vecs = sps.linalg.eigsh(matrix, k=Neval, which='SA')
+    vals, vecs = sps.linalg.eigsh(matrix, k=20, which='SA')
     vals.sort()
     print ('lowest eigenvalue of H from np.linalg.eigsh = ')
     print (vals)
@@ -127,44 +153,45 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
         number = 2
     else:
         number = 1
-    print ('Degeneracy of ground state is ' ,number)        
-
+    print ('Degeneracy of ground state is ' ,number)      
     
-    wgt_LmLn = np.zeros(50)
-    wgt_d9Ld10L2 = np.zeros(50)
-    wgt_d9d10L3 = np.zeros(50)
-    wgt_d10L3d9 = np.zeros(50)        
-    wgt_d9L2d10L= np.zeros(50)
-    wgt_d10Ld9L2= np.zeros(50)
-    wgt_d10d9L3= np.zeros(50)   
-    wgt_d10L2d9L= np.zeros(50)  
-    wgt_d8Ld10L= np.zeros(50)
-    wgt_d10Ld8L= np.zeros(50)        
-    wgt_d8d10L2= np.zeros(50)
-    wgt_d10d8L2 = np.zeros(50)
-    wgt_d8L2d10 = np.zeros(50)        
-    wgt_d10L2d8 = np.zeros(50) 
-    wgt_d9L2d9 = np.zeros(50)
-    wgt_d9d9L2 = np.zeros(50)    
-    wgt_d9Ld9L = np.zeros(50)         
-    wgt_d9d8L = np.zeros(50)     
-    wgt_d8d9L = np.zeros(50) 
-    wgt_d9Ld8 = np.zeros(50)  
-    wgt_d8Ld9 = np.zeros(50)
-    wgt_d8d8 = np.zeros(50)     
-    wgt_H = np.zeros(50) 
-    wgt_s = np.zeros(50) 
-    wgt_ddss = np.zeros(50)    
-    wgt_ddsp = np.zeros(50)           
-    wgt_dssp = np.zeros(50)         
-    wgt_dspp = np.zeros(50)    
-    wgt_ddds = np.zeros(50)               
-
+    wgt_LmLn = np.zeros(40)
+    wgt_d8d8L = np.zeros(40)
+    wgt_d8Ld8 = np.zeros(40)
+    wgt_d9Ld8L = np.zeros(40) 
+    wgt_d8Ld9L = np.zeros(40)         
+    wgt_d9L2d8= np.zeros(40)
+    wgt_d8d9L2= np.zeros(40)        
+    wgt_d9d8L2= np.zeros(40)
+    wgt_d9L3d9= np.zeros(40)   
+    wgt_d9L2d9L= np.zeros(40)  
+    wgt_d9Ld9L2= np.zeros(40)
+    wgt_d9d9L3= np.zeros(40)        
+    wgt_d8L3d10= np.zeros(40)   
+    wgt_d8L2d10L= np.zeros(40)  
+    wgt_d8Ld10L2= np.zeros(40)
+    wgt_d8d10L3= np.zeros(40) 
+    wgt_d9d10L4= np.zeros(40)
+    wgt_d9Ld10L3= np.zeros(40)        
+    wgt_d9L2d10L2= np.zeros(40)          
+    wgt_d9L3d10L= np.zeros(40)   
+    wgt_d9L4d10= np.zeros(40)  
     wgt_a1= np.zeros(10)   
     wgt_b1= np.zeros(10)       
     wgt_L= np.zeros(10) 
-    wgt_O= np.zeros(10)     
-    text= np.zeros(10)       
+    wgt_O= np.zeros(10)      
+
+    wgt_s= np.zeros(40)         
+    wgt_ds= np.zeros(40)           
+    wgt_dds= np.zeros(80)    
+    wgt_ddds= np.zeros(80)           
+    wgt_dddds= np.zeros(80)         
+    sumweight=0
+    sumweight1=0
+    synweight2=0
+    
+    test= np.zeros(10)  
+    
     
     #get state components in GS and another 9 higher states; note that indices is a tuple
     for k in range(0,number):                                                                          #gai
@@ -174,20 +201,18 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
         #    continue
             
         print ('eigenvalue = ', vals[k])
+        print ('k = ', k)        
         indices = np.nonzero(abs(vecs[:,k])>0.1)
 
-
-      
-    
+       
+        
 #         s11=0
 #         s10=0        
 #         s01=0
 #         s00=0        
         #Sumweight refers to the general weight.Sumweight1 refers to the weight in indices.Sumweight_picture refers to the weight that is calculated.Sumweight2 refers to the weight that differs by orbits
 
-        sumweight=0
-        sumweight1=0
-        synweight2=0
+
         # stores all weights for sorting later
         dim = len(vecs[:,k])
         allwgts = np.zeros(dim)
@@ -210,20 +235,22 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
             total += weight
                 
             state = VS.get_state(VS.lookup_tbl[istate])
-
-        
+            
             s1 = state['hole1_spin']
             s2 = state['hole2_spin']
             s3 = state['hole3_spin']
-            s4 = state['hole4_spin']            
+            s4 = state['hole4_spin'] 
+            s5 = state['hole5_spin']             
             orb1 = state['hole1_orb']
             orb2 = state['hole2_orb']
             orb3 = state['hole3_orb']
-            orb4 = state['hole4_orb']            
+            orb4 = state['hole4_orb'] 
+            orb5 = state['hole5_orb']             
             x1, y1, z1 = state['hole1_coord']
             x2, y2, z2 = state['hole2_coord']
             x3, y3, z3 = state['hole3_coord']
-            x4, y4, z4 = state['hole4_coord']            
+            x4, y4, z4 = state['hole4_coord']  
+            x5, y5, z5 = state['hole5_coord']              
 
             #if abs(x1)>1. or abs(y1)>1. or abs(x2)>1. or abs(y2)>1.:
             #    continue
@@ -231,43 +258,43 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
             Sz_Ni_12 = Sz_Ni_val[istate]
             S_Cu_12  = S_Cu_val[istate]
             Sz_Cu_12 = Sz_Cu_val[istate]
-            bonding = bonding_val[istate]            
+            bonding = bonding_val[istate]
 #             S_Niother_12  = S_other_Ni_val[i]
 #             Sz_Niother_12 = Sz_other_Ni_val[i]
 #             S_Cuother_12  = S_other_Cu_val[i]
 #             Sz_Cuother_12 = Sz_other_Cu_val[i]
-             
-#             print (' state ', i, ' ',orb1,s1,x1,y1,z1,' ',orb2,s2,x2,y2,z2,' ',orb3,s3,x3,y3,z3,' ',orb4,s4,x4,y4,z4,\
+
+#             print ( i, ' ',orb1,s1,x1,y1,z1,' ',orb2,s2,x2,y2,z2,' ',orb3,s3,x3,y3,z3,' ',orb4,s4,x4,y4,z4,' ',orb5,s5,x5,y5,z5,\
 #                '\n S_Ni=', S_Ni_12, ',  Sz_Ni=', Sz_Ni_12, \
 #                ',  S_Cu=', S_Cu_12, ',  Sz_Cu=', Sz_Cu_12, \
-#                ", weight = ", weight,'\n')   
-                    
-    
-    
-    
-            slabel=[s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4]
+#                ", weight = ", weight,'\n')                     
+
+            slabel=[s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
             slabel= make_z_canonical(slabel)
             s1 = slabel[0]; orb1 = slabel[1]; x1 = slabel[2]; y1 = slabel[3]; z1 = slabel[4];
             s2 = slabel[5]; orb2 = slabel[6]; x2 = slabel[7]; y2 = slabel[8]; z2 = slabel[9];
             s3 = slabel[10]; orb3 = slabel[11]; x3 = slabel[12]; y3 = slabel[13]; z3 = slabel[14];
             s4 = slabel[15]; orb4 = slabel[16]; x4 = slabel[17]; y4 = slabel[18]; z4 = slabel[19];     
-            
-            
-            
-            if weight > 0.01:
-                sumweight1=sumweight1+abs(vecs[i,k])**2
-                print (' state ', istate, ' ',orb1,s1,x1,y1,z1,' ',orb2,s2,x2,y2,z2,' ',orb3,s3,x3,y3,z3,' ',orb4,s4,x4,y4,z4,\
+            s5 = slabel[20]; orb5 = slabel[21]; x5 = slabel[22]; y5 = slabel[23]; z5 = slabel[24];                
+    
+    
+      
+    
+    
+            if weight >0.001:
+                sumweight1=sumweight1+abs(vecs[istate,k])**2
+                print (' state ', istate, ' ',orb1,s1,x1,y1,z1,' ',orb2,s2,x2,y2,z2,' ',orb3,s3,x3,y3,z3,' ',orb4,s4,x4,y4,z4,' ',orb5,s5,x5,y5,z5,\
                    '\n S_Ni=', S_Ni_12, ',  Sz_Ni=', Sz_Ni_12, \
-                   ',  S_Cu=', S_Cu_12, ',  Sz_Cu=', Sz_Cu_12, \
-                   ", weight = ", weight,'\n')   
-
-
+                   ',  S_Cu=', S_Cu_12, ',  Sz_Cu=', Sz_Cu_12, ',  bonding=',bonding, \
+                   ", weight = ", weight,'\n')  
+                
+                
             if bonding==0:
-                text[0]+=abs(vecs[istate,k])**2 
+                test[6]+=abs(vecs[istate,k])**2 
             if bonding==1:
-                text[1]+=abs(vecs[istate,k])**2 
+                test[7]+=abs(vecs[istate,k])**2 
             if bonding==-1:
-                text[2]+=abs(vecs[istate,k])**2                 
+                test[8]+=abs(vecs[istate,k])**2                 
                 
                 
             if orb1 =='d3z2r2': 
@@ -304,942 +331,705 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
             elif orb4 in pam.O_orbs:    
                 wgt_L[0]+=abs(vecs[istate,k])**2  
             elif orb4 in pam.Obilayer_orbs:    
-                wgt_O[0]+=abs(vecs[istate,k])**2                  
+                wgt_O[0]+=abs(vecs[istate,k])**2  
                 
+            if orb5 =='d3z2r2': 
+                wgt_a1[0]+=abs(vecs[istate,k])**2      
+            elif orb5 =='dx2y2':    
+                wgt_b1[0]+=abs(vecs[istate,k])**2   
+            elif orb5 in pam.O_orbs:    
+                wgt_L[0]+=abs(vecs[istate,k])**2  
+            elif orb5 in pam.Obilayer_orbs:    
+                wgt_O[0]+=abs(vecs[istate,k])**2                       
                 
-                
-            if (orb1 in pam.O_orbs) and  (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs)  and  (orb4 in pam.O_orbs):
+            if (orb1 in pam.O_orbs) and (orb2 in pam.O_orbs) and  (orb3 in pam.O_orbs)  and  (orb4 in pam.O_orbs) and  (orb5 in pam.O_orbs): 
                 wgt_LmLn[0]+=abs(vecs[istate,k])**2 
-                if S_Ni_12==0 and S_Cu_12==0:                     
-                    wgt_LmLn[1]+=abs(vecs[istate,k])**2     
-                elif S_Ni_12==1 and S_Cu_12==0:                     
-                    wgt_LmLn[2]+=abs(vecs[istate,k])**2                         
-                elif S_Ni_12==0 and S_Cu_12==1:                     
-                    wgt_LmLn[3]+=abs(vecs[istate,k])**2                         
-                elif S_Ni_12==1 and S_Cu_12==1:                     
-                    wgt_LmLn[4]+=abs(vecs[istate,k])**2   
                 if bonding==0:
-                    wgt_LmLn[46]+=abs(vecs[istate,k])**2 
+                    wgt_LmLn[36]+=abs(vecs[istate,k])**2 
                 if bonding==1:
-                    wgt_LmLn[47]+=abs(vecs[istate,k])**2 
+                    wgt_LmLn[37]+=abs(vecs[istate,k])**2 
                 if bonding==-1:
-                    wgt_LmLn[48]+=abs(vecs[istate,k])**2                       
-                    
-                    
+                    wgt_LmLn[38]+=abs(vecs[istate,k])**2                     
 
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs)\
-                      and (orb4 in pam.O_orbs)  and z1==z2==2 and z3==z4==0:
-                if orb1=='dx2y2':
-                    wgt_d9Ld10L2[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2': 
-                    wgt_d9Ld10L2[1]+=abs(vecs[istate,k])**2   
-                if orb1=='dx2y2':
-                    if S_Ni_12==0 and S_Cu_12==0:                     
-                        wgt_d9Ld10L2[2]+=abs(vecs[istate,k])**2     
-                    elif S_Ni_12==1 and S_Cu_12==0:                     
-                        wgt_d9Ld10L2[3]+=abs(vecs[istate,k])**2                         
-                    elif S_Ni_12==0 and S_Cu_12==1:                     
-                        wgt_d9Ld10L2[4]+=abs(vecs[istate,k])**2                         
-                    elif S_Ni_12==1 and S_Cu_12==1:                     
-                        wgt_d9Ld10L2[5]+=abs(vecs[istate,k])**2                         
-                if orb1=='d3z2r2':
-                    if S_Ni_12==0 and S_Cu_12==0:                     
-                        wgt_d9Ld10L2[6]+=abs(vecs[istate,k])**2     
-                    elif S_Ni_12==1 and S_Cu_12==0:                     
-                        wgt_d9Ld10L2[7]+=abs(vecs[istate,k])**2                         
-                    elif S_Ni_12==0 and S_Cu_12==1:                     
-                        wgt_d9Ld10L2[8]+=abs(vecs[istate,k])**2                         
-                    elif S_Ni_12==1 and S_Cu_12==1:                     
-                        wgt_d9Ld10L2[9]+=abs(vecs[istate,k])**2
-                if s1=='up':        
-                    wgt_d9Ld10L2[10]+=abs(vecs[istate,k])**2      
-                if s1=='dn':        
-                    wgt_d9Ld10L2[11]+=abs(vecs[istate,k])**2  
-                if bonding==0:
-                    wgt_d9Ld10L2[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d9Ld10L2[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d9Ld10L2[48]+=abs(vecs[istate,k])**2                     
-                    
-                        
-                        
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs)\
-                      and (orb4 in pam.O_orbs) and z1==2 and z2==z3==z4==0:
-                if orb1=='dx2y2':
-                    wgt_d9d10L3[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2':
-                    wgt_d9d10L3[1]+=abs(vecs[istate,k])**2  
-                if bonding==0:
-                    wgt_d9d10L3[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d9d10L3[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d9d10L3[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs)\
-                      and (orb4 in pam.O_orbs) and z1==0 and z2==z3==z4==2:
-                if orb1=='dx2y2':
-                    wgt_d10L3d9[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2': 
-                    wgt_d10L3d9[1]+=abs(vecs[istate,k])**2   
-                if orb1=='dx2y2':
-                    if s1=='up':                     
-                        wgt_d10L3d9[2]+=abs(vecs[istate,k])**2     
-                    elif s1=='dn':                     
-                        wgt_d10L3d9[3]+=abs(vecs[istate,k])**2                                            
-                if orb1=='d3z2r2':
-                    if s1=='up':                     
-                        wgt_d10L3d9[4]+=abs(vecs[istate,k])**2     
-                    elif s1=='dn':                     
-                        wgt_d10L3d9[5]+=abs(vecs[istate,k])**2     
-                if bonding==0:
-                    wgt_d10L3d9[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d10L3d9[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d10L3d9[48]+=abs(vecs[istate,k])**2                         
-                        
-                        
-                        
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==z3==2 and z4==0:
-                if orb1=='dx2y2':
-                    wgt_d9L2d10L[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2':
-                    wgt_d9L2d10L[1]+=abs(vecs[istate,k])**2   
-                if bonding==0:
-                    wgt_d9L2d10L[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d9L2d10L[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d9L2d10L[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z2==2 and z1==z3==z4==0:
-                if orb1=='dx2y2':
-                    wgt_d10Ld9L2[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2':
-                    wgt_d10Ld9L2[1]+=abs(vecs[istate,k])**2 
-                if bonding==0:
-                    wgt_d10Ld9L2[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d10Ld9L2[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d10Ld9L2[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==z3==z4==0:
-                if orb1=='dx2y2':
-                    wgt_d10d9L3[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2':
-                    wgt_d10d9L3[1]+=abs(vecs[istate,k])**2    
-                if bonding==0:
-                    wgt_d10d9L3[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d10d9L3[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d10d9L3[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z2==z3==2 and z1==z4==0:
-                if orb1=='dx2y2':
-                    wgt_d10L2d9L[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2':
-                    wgt_d10L2d9L[1]+=abs(vecs[istate,k])**2 
-                if bonding==0:
-                    wgt_d10L2d9L[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d10L2d9L[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d10L2d9L[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==2 and z3==2 and z4==0 :
-                if orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==0:
-                    wgt_d8Ld10L[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==1:
-                    wgt_d8Ld10L[1]+=abs(vecs[istate,k])**2    
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and S_Ni_12==0:
-                    wgt_d8Ld10L[2]+=abs(vecs[istate,k])**2  
-                elif orb1=='dx2y2' and orb2=='dx2y2' and S_Ni_12==0:
-                    wgt_d8Ld10L[3]+=abs(vecs[istate,k])**2  
-                if bonding==0:
-                    wgt_d8Ld10L[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d8Ld10L[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d8Ld10L[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==0 and z3==2 and z4==0 :
-                if orb1=='d3z2r2' and orb2=='dx2y2' and S_Cu_12==0:
-                    wgt_d10Ld8L[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='dx2y2' and S_Cu_12==1:
-                    wgt_d10Ld8L[1]+=abs(vecs[istate,k])**2    
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and S_Cu_12==0:
-                    wgt_d10Ld8L[2]+=abs(vecs[istate,k])**2  
-                elif orb1=='dx2y2' and orb2=='dx2y2' and S_Cu_12==0:
-                    wgt_d10Ld8L[3]+=abs(vecs[istate,k])**2    
-                if bonding==0:
-                    wgt_d10Ld8L[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d10Ld8L[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d10Ld8L[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                                          
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==2 and z3==z4==0 :
-                if orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==0:
-                    wgt_d8d10L2[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==1:
-                    wgt_d8d10L2[1]+=abs(vecs[istate,k])**2    
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and S_Ni_12==0:
-                    wgt_d8d10L2[2]+=abs(vecs[istate,k])**2  
-                elif orb1=='dx2y2' and orb2=='dx2y2' and S_Ni_12==0:
-                    wgt_d8d10L2[3]+=abs(vecs[istate,k])**2     
-                if bonding==0:
-                    wgt_d8d10L2[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d8d10L2[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d8d10L2[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==0 and z3==z4==0 :
-                if orb1=='d3z2r2' and orb2=='dx2y2' and S_Cu_12==0:
-                    wgt_d10d8L2[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='dx2y2' and S_Cu_12==1:
-                    wgt_d10d8L2[1]+=abs(vecs[istate,k])**2    
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and S_Cu_12==0:
-                    wgt_d10d8L2[2]+=abs(vecs[istate,k])**2  
-                elif orb1=='dx2y2' and orb2=='dx2y2' and S_Cu_12==0:
-                    wgt_d10d8L2[3]+=abs(vecs[istate,k])**2    
-                if bonding==0:
-                    wgt_d10d8L2[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d10d8L2[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d10d8L2[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-                    
-                                     
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==2 and z3==z4==2 :
-                if orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==0:
-                    wgt_d8L2d10[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==1:
-                    wgt_d8L2d10[1]+=abs(vecs[istate,k])**2    
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and S_Ni_12==0:
-                    wgt_d8L2d10[2]+=abs(vecs[istate,k])**2  
-                elif orb1=='dx2y2' and orb2=='dx2y2' and S_Ni_12==0:
-                    wgt_d8L2d10[3]+=abs(vecs[istate,k])**2     
-                if bonding==0:
-                    wgt_d8L2d10[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d8L2d10[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d8L2d10[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-                    
-               
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==0 and z3==z4==2 :
-                if orb1=='d3z2r2' and orb2=='dx2y2' and S_Cu_12==0:
-                    wgt_d10L2d8[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='dx2y2' and S_Cu_12==1:
-                    wgt_d10L2d8[1]+=abs(vecs[istate,k])**2    
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and S_Cu_12==0:
-                    wgt_d10L2d8[2]+=abs(vecs[istate,k])**2  
-                elif orb1=='dx2y2' and orb2=='dx2y2' and S_Cu_12==0:
-                    wgt_d10L2d8[3]+=abs(vecs[istate,k])**2                  
-                if bonding==0:
-                    wgt_d10L2d8[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d10L2d8[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d10L2d8[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==2 and z2==0 and z3==z4==2 :                               
-                if orb1=='d3z2r2' and orb2=='dx2y2':
-                    wgt_d9L2d9[0]+=abs(vecs[istate,k])**2 
-                    if s3==s4 and s1=='up':
-                        wgt_d9L2d9[4]+=abs(vecs[istate,k])**2
-                    elif s3==s4 and s1=='dn':
-                        wgt_d9L2d9[5]+=abs(vecs[istate,k])**2                        
-                    elif s3!=s4 and s1=='up':
-                        wgt_d9L2d9[6]+=abs(vecs[istate,k])**2
-                    elif s3!=s4 and s1=='dn':
-                        wgt_d9L2d9[7]+=abs(vecs[istate,k])**2                       
-                       
-                elif orb1=='dx2y2' and orb2=='d3z2r2':
-                    wgt_d9L2d9[1]+=abs(vecs[istate,k])**2            
-                elif orb1=='d3z2r2' and orb2=='d3z2r2':
-                    wgt_d9L2d9[2]+=abs(vecs[istate,k])**2    
-                elif orb1=='dx2y2' and orb2=='dx2y2':
-                    wgt_d9L2d9[3]+=abs(vecs[istate,k])**2  
-                    if s3==s4 and s1=='up':
-                        wgt_d9L2d9[8]+=abs(vecs[istate,k])**2
-                    elif s3==s4 and s1=='dn':
-                        wgt_d9L2d9[9]+=abs(vecs[istate,k])**2                        
-                    elif s3!=s4 and s1=='up':
-                        wgt_d9L2d9[10]+=abs(vecs[istate,k])**2
-                    elif s3!=s4 and s1=='dn':
-                        wgt_d9L2d9[11]+=abs(vecs[istate,k])**2    
-                if bonding==0:
-                    wgt_d9L2d9[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d9L2d9[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d9L2d9[48]+=abs(vecs[istate,k])**2                         
-                        
-                        
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==2 and z2==0 and z3==z4==0 :                               
-                if orb1=='d3z2r2' and orb2=='dx2y2':
-                    wgt_d9d9L2[0]+=abs(vecs[istate,k])**2    
-                elif orb1=='dx2y2' and orb2=='d3z2r2':
-                    wgt_d9d9L2[1]+=abs(vecs[istate,k])**2            
-                elif orb1=='d3z2r2' and orb2=='d3z2r2':
-                    wgt_d9d9L2[2]+=abs(vecs[istate,k])**2    
-                elif orb1=='dx2y2' and orb2=='dx2y2':
-                    wgt_d9d9L2[3]+=abs(vecs[istate,k])**2    
-                if bonding==0:
-                    wgt_d9d9L2[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d9d9L2[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d9d9L2[48]+=abs(vecs[istate,k])**2                     
-                    
-                    
-                    
-                
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.O_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==2 and z2==0 and z3==2 and z4==0 :     
-             
-                if orb1=='dx2y2' and orb2=='dx2y2' :
-                    wgt_d9Ld9L[0]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2' and orb2=='dx2y2' :
-                    wgt_d9Ld9L[1]+=abs(vecs[istate,k])**2   
-                elif orb1=='dx2y2' and orb2=='d3z2r2' :
-                    wgt_d9Ld9L[2]+=abs(vecs[istate,k])**2   
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' :
-                    wgt_d9Ld9L[3]+=abs(vecs[istate,k])**2       
-                    
-                    
-                if  orb1=='dx2y2' and orb2=='dx2y2' and S_Ni_12==0 and S_Cu_12==0: 
-                    wgt_d9Ld9L[4]+=abs(vecs[istate,k])**2
-                    if i in indices[0]: 
-                        print (' state ', i, ' ',orb1,s1,x1,y1,z1,' ',orb2,s2,x2,y2,z2,' ',orb3,s3,x3,y3,z3,' ',orb4,s4,x4,y4,z4,\
-                           '\n S_Ni=', S_Ni_12, ',  Sz_Ni=', Sz_Ni_12, \
-                           ',  S_Cu=', S_Cu_12, ',  Sz_Cu=', Sz_Cu_12, \
-                           ", weight = ", weight,'\n')   
         
-                    if s1==s2:
-                        wgt_d9Ld9L[20]+=abs(vecs[istate,k])**2 
-                    elif s1!=s2:
-                        wgt_d9Ld9L[21]+=abs(vecs[istate,k])**2                          
-                    
-                elif  orb1=='dx2y2' and orb2=='dx2y2' and S_Ni_12==1 and S_Cu_12==0: 
-                    wgt_d9Ld9L[5]+=abs(vecs[istate,k])**2                    
-                elif  orb1=='dx2y2' and orb2=='dx2y2' and S_Ni_12==0 and S_Cu_12==1: 
-                    wgt_d9Ld9L[6]+=abs(vecs[istate,k])**2                          
-                elif  orb1=='dx2y2' and orb2=='dx2y2' and S_Ni_12==1 and S_Cu_12==1: 
-                    wgt_d9Ld9L[7]+=abs(vecs[istate,k])**2                          
-                elif  orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==0 and S_Cu_12==0: 
-                    wgt_d9Ld9L[8]+=abs(vecs[istate,k])**2
-                elif  orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==1 and S_Cu_12==0: 
-                    wgt_d9Ld9L[9]+=abs(vecs[istate,k])**2   
-                    if s1==s2:
-                        wgt_d9Ld9L[22]+=abs(vecs[istate,k])**2 
-                    elif s1!=s2:
-                        wgt_d9Ld9L[23]+=abs(vecs[istate,k])**2                         
-           
-                elif  orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==0 and S_Cu_12==1: 
-                    wgt_d9Ld9L[10]+=abs(vecs[istate,k])**2                          
-                elif  orb1=='d3z2r2' and orb2=='dx2y2' and S_Ni_12==1 and S_Cu_12==1: 
-                    wgt_d9Ld9L[11]+=abs(vecs[istate,k])**2                              
-                elif  orb1=='dx2y2' and orb2=='d3z2r2' and S_Ni_12==0 and S_Cu_12==0: 
-                    wgt_d9Ld9L[12]+=abs(vecs[istate,k])**2
-                elif  orb1=='dx2y2' and orb2=='d3z2r2' and S_Ni_12==1 and S_Cu_12==0: 
-                    wgt_d9Ld9L[13]+=abs(vecs[istate,k])**2                    
-                elif  orb1=='dx2y2' and orb2=='d3z2r2' and S_Ni_12==0 and S_Cu_12==1: 
-                    wgt_d9Ld9L[14]+=abs(vecs[istate,k])**2                          
-                elif  orb1=='dx2y2' and orb2=='d3z2r2' and S_Ni_12==1 and S_Cu_12==1: 
-                    wgt_d9Ld9L[15]+=abs(vecs[istate,k])**2                          
-                elif  orb1=='d3z2r2' and orb2=='d3z2r2' and S_Ni_12==0 and S_Cu_12==0: 
-                    wgt_d9Ld9L[16]+=abs(vecs[istate,k])**2
-                elif  orb1=='d3z2r2' and orb2=='d3z2r2' and S_Ni_12==1 and S_Cu_12==0: 
-                    wgt_d9Ld9L[17]+=abs(vecs[istate,k])**2                    
-                elif  orb1=='d3z2r2' and orb2=='d3z2r2' and S_Ni_12==0 and S_Cu_12==1: 
-                    wgt_d9Ld9L[18]+=abs(vecs[istate,k])**2                          
-                elif  orb1=='d3z2r2' and orb2=='d3z2r2' and S_Ni_12==1 and S_Cu_12==1: 
-                    wgt_d9Ld9L[19]+=abs(vecs[istate,k])**2     
-                if bonding==0:
-                    wgt_d9Ld9L[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d9Ld9L[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d9Ld9L[48]+=abs(vecs[istate,k])**2                     
 
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.Ni_Cu_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==2 and z2==z3==z4==0:                     
-                if orb1=='dx2y2' and orb2=='d3z2r2'  and  orb3=='d3z2r2' and S_Cu_12==0:
-                    wgt_d9d8L[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Cu_12==0:
-                    wgt_d9d8L[1]+=abs(vecs[istate,k])**2                       
-                elif orb1=='dx2y2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Cu_12==0:
-                    wgt_d9d8L[2]+=abs(vecs[istate,k])**2                       
-                elif orb1=='d3z2r2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Cu_12==1:
-                    wgt_d9d8L[3]+=abs(vecs[istate,k])**2       
-                elif orb1=='dx2y2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Cu_12==1:
-                    wgt_d9d8L[4]+=abs(vecs[istate,k])**2                     
-                elif orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='dx2y2' and S_Cu_12==0:
-                    wgt_d9d8L[5]+=abs(vecs[istate,k])**2 
-                elif orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='dx2y2' and S_Cu_12==0:
-                    wgt_d9d8L[6]+=abs(vecs[istate,k])**2                 
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.O_orbs) and z1==z2==z5==2 and z3==z4==0 : 
+                wgt_d8Ld8[0]+=abs(vecs[istate,k])**2
+                if orb1==orb2==orb3==orb4=='dx2y2':
+                    wgt_d8Ld8[1]+=abs(vecs[istate,k])**2                
+                elif orb1==orb3=='d3z2r2' and orb2==orb4=='dx2y2':
+                    wgt_d8Ld8[2]+=abs(vecs[istate,k])**2  
+                elif orb1=='d3z2r2' and orb2==orb3==orb4=='dx2y2':
+                    wgt_d8Ld8[3]+=abs(vecs[istate,k])**2                      
+                elif orb3=='d3z2r2' and orb1==orb2==orb4=='dx2y2':
+                    wgt_d8Ld8[4]+=abs(vecs[istate,k])**2                        
                 if bonding==0:
-                    wgt_d9d8L[46]+=abs(vecs[istate,k])**2 
+                    wgt_d8Ld8[36]+=abs(vecs[istate,k])**2 
                 if bonding==1:
-                    wgt_d9d8L[47]+=abs(vecs[istate,k])**2 
+                    wgt_d8Ld8[37]+=abs(vecs[istate,k])**2 
                 if bonding==-1:
-                    wgt_d9d8L[48]+=abs(vecs[istate,k])**2              
-            
-            
-            
+                    wgt_d8Ld8[38]+=abs(vecs[istate,k])**2   
                 
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.Ni_Cu_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==2 and z3==z4==0:                 
-                if orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='d3z2r2':
-                    wgt_d8d9L[0]+=abs(vecs[istate,k])**2                                  
-                elif orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='d3z2r2':
-                    wgt_d8d9L[1]+=abs(vecs[istate,k])**2                       
-                elif orb1=='d3z2r2' and orb2=='d3z2r2'  and  orb3=='dx2y2':
-                    wgt_d8d9L[2]+=abs(vecs[istate,k])**2          
-                elif orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='dx2y2':
-                    wgt_d8d9L[3]+=abs(vecs[istate,k])**2       
-                elif orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='dx2y2':
-                    wgt_d8d9L[4]+=abs(vecs[istate,k])**2  
-                if orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='d3z2r2':
-                    if S_Ni_12==0 and S_Cu_12==0:
-                        wgt_d8d9L[5]+=abs(vecs[istate,k])**2                               
-                    elif S_Ni_12==1 and S_Cu_12==0:
-                        wgt_d8d9L[6]+=abs(vecs[istate,k])**2 
-                    elif S_Ni_12==0 and S_Cu_12==1:
-                        wgt_d8d9L[7]+=abs(vecs[istate,k])**2                                
-                    elif S_Ni_12==1 and S_Cu_12==1:
-                        wgt_d8d9L[8]+=abs(vecs[istate,k])**2
-                        if s1==s2 and s1==s3:
-                            wgt_d8d9L[25]+=abs(vecs[istate,k])**2 
-                        elif s1==s2 and s1!=s3:
-                            wgt_d8d9L[26]+=abs(vecs[istate,k])**2                             
-                        elif s1!=s2 and s1==s3:
-                            wgt_d8d9L[27]+=abs(vecs[istate,k])**2     
-                        elif s1!=s2 and s1!=s3:
-                            wgt_d8d9L[28]+=abs(vecs[istate,k])**2         
-                                
-                if orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='d3z2r2': 
-                    if S_Ni_12==0 and S_Cu_12==0:
-                        wgt_d8d9L[9]+=abs(vecs[istate,k])**2                               
-                    elif S_Ni_12==1 and S_Cu_12==0:
-                        wgt_d8d9L[10]+=abs(vecs[istate,k])**2        
-                    elif S_Ni_12==0 and S_Cu_12==1:
-                        wgt_d8d9L[11]+=abs(vecs[istate,k])**2                                
-                    elif S_Ni_12==1 and S_Cu_12==1:
-                        wgt_d8d9L[12]+=abs(vecs[istate,k])**2                        
-                if orb1=='d3z2r2' and orb2=='d3z2r2'  and  orb3=='dx2y2':
-                    if S_Ni_12==0 and S_Cu_12==0:
-                        wgt_d8d9L[13]+=abs(vecs[istate,k])**2                               
-                    elif S_Ni_12==1 and S_Cu_12==0:
-                        wgt_d8d9L[14]+=abs(vecs[istate,k])**2 
-                    elif S_Ni_12==0 and S_Cu_12==1:
-                        wgt_d8d9L[15]+=abs(vecs[istate,k])**2                                
-                    elif S_Ni_12==1 and S_Cu_12==1:
-                        wgt_d8d9L[16]+=abs(vecs[istate,k])**2             
-                if orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='dx2y2':
-                    if S_Ni_12==0 and S_Cu_12==0:
-                        wgt_d8d9L[17]+=abs(vecs[istate,k])**2                               
-                    elif S_Ni_12==1 and S_Cu_12==0:
-                        wgt_d8d9L[18]+=abs(vecs[istate,k])**2 
-                        if s1==s3:
-                            wgt_d8d9L[29]+=abs(vecs[istate,k])**2 
-                        elif s1!=s3:
-                            wgt_d8d9L[30]+=abs(vecs[istate,k])**2                                  
-                        
-                    elif S_Ni_12==0 and S_Cu_12==1:
-                        wgt_d8d9L[19]+=abs(vecs[istate,k])**2                                
-                    elif S_Ni_12==1 and S_Cu_12==1:
-                        wgt_d8d9L[20]+=abs(vecs[istate,k])**2         
-                if orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='dx2y2':
-                    if S_Ni_12==0 and S_Cu_12==0:
-                        wgt_d8d9L[21]+=abs(vecs[istate,k])**2                               
-                    elif S_Ni_12==1 and S_Cu_12==0:
-                        wgt_d8d9L[22]+=abs(vecs[istate,k])**2        
-                    elif S_Ni_12==0 and S_Cu_12==1:
-                        wgt_d8d9L[23]+=abs(vecs[istate,k])**2                                
-                    elif S_Ni_12==1 and S_Cu_12==1:
-                        wgt_d8d9L[24]+=abs(vecs[istate,k])**2                            
-                if bonding==0:
-                    wgt_d8d9L[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d8d9L[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d8d9L[48]+=abs(vecs[istate,k])**2 
-                    
-                    
                     
 
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.Ni_Cu_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z4==2 and z2==z3==0:                 
-                if orb1=='dx2y2' and orb2=='d3z2r2'  and  orb3=='d3z2r2' and S_Cu_12==0:
-                    wgt_d9Ld8[0]+=abs(vecs[istate,k])**2                      
-                elif orb1=='d3z2r2' and orb2=='d3z2r2'  and  orb3=='dx2y2' :
-                    wgt_d9Ld8[1]+=abs(vecs[istate,k])**2                       
-                elif orb1=='dx2y2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Cu_12==0:
-                    wgt_d9Ld8[2]+=abs(vecs[istate,k])**2                       
-                elif orb1=='d3z2r2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Cu_12==1:
-                    wgt_d9Ld8[3]+=abs(vecs[istate,k])**2       
-                elif orb1=='dx2y2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Cu_12==1:
-                    wgt_d9Ld8[4]+=abs(vecs[istate,k])**2                     
-                elif orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='dx2y2' and S_Cu_12==0:
-                    wgt_d9Ld8[5]+=abs(vecs[istate,k])**2 
-                elif orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='dx2y2':
-                    wgt_d9Ld8[6]+=abs(vecs[istate,k])**2                 
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.O_orbs) and z1==z2==2 and z3==z4==z5==0 : 
+                wgt_d8d8L[0]+=abs(vecs[istate,k])**2             
+                if orb1==orb2==orb3==orb4=='dx2y2':
+                    wgt_d8d8L[1]+=abs(vecs[istate,k])**2                
+                elif orb1==orb3=='d3z2r2' and orb2==orb4=='dx2y2':
+                    wgt_d8d8L[2]+=abs(vecs[istate,k])**2                
+                elif orb1=='d3z2r2' and orb2==orb3==orb4=='dx2y2':
+                    wgt_d8d8L[3]+=abs(vecs[istate,k])**2                      
+                elif orb3=='d3z2r2' and orb1==orb2==orb4=='dx2y2':
+                    wgt_d8d8L[4]+=abs(vecs[istate,k])**2
                 if bonding==0:
-                    wgt_d9Ld8[46]+=abs(vecs[istate,k])**2 
+                    wgt_d8d8L[36]+=abs(vecs[istate,k])**2 
                 if bonding==1:
-                    wgt_d9Ld8[47]+=abs(vecs[istate,k])**2 
+                    wgt_d8d8L[37]+=abs(vecs[istate,k])**2 
                 if bonding==-1:
-                    wgt_d9Ld8[48]+=abs(vecs[istate,k])**2 
-                    
-                    
-                    
-                    
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.Ni_Cu_orbs) \
-                      and (orb4 in pam.O_orbs) and z1==z2==z4==2 and z3==0:                      
-                if orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='d3z2r2' and S_Ni_12==0:
-                    wgt_d8Ld9[0]+=abs(vecs[istate,k])**2                       
-                elif orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='d3z2r2' and S_Ni_12==1:
-                    wgt_d8Ld9[1]+=abs(vecs[istate,k])**2                       
-                elif orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='d3z2r2' and S_Ni_12==0:
-                    wgt_d8Ld9[2]+=abs(vecs[istate,k])**2                       
-                elif orb1=='d3z2r2' and orb2=='d3z2r2'  and  orb3=='dx2y2' and S_Ni_12==0:
-                    wgt_d8Ld9[3]+=abs(vecs[istate,k])**2     
-                elif orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='dx2y2' and S_Ni_12==1:
-                    wgt_d8Ld9[4]+=abs(vecs[istate,k])**2       
-                elif orb1=='d3z2r2' and orb2=='dx2y2'  and  orb3=='dx2y2' and S_Ni_12==0:
-                    wgt_d8Ld9[5]+=abs(vecs[istate,k])**2   
-                elif orb1=='dx2y2' and orb2=='dx2y2'  and  orb3=='dx2y2' and S_Ni_12==0:
-                    wgt_d8Ld9[6]+=abs(vecs[istate,k])**2                   
-                if bonding==0:
-                    wgt_d8Ld9[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_d8Ld9[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_d8Ld9[48]+=abs(vecs[istate,k])**2 
-                    
-                    
-                    
+                    wgt_d8d8L[38]+=abs(vecs[istate,k])**2                                             
 
-            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs)  and  (orb3 in pam.Ni_Cu_orbs) \
-                      and (orb4 in pam.Ni_Cu_orbs) and z1==z2==2 and z3==z4==0:                      
-                if orb1=='dx2y2' and orb2=='dx2y2'  and orb3=='d3z2r2' and orb4=='d3z2r2':
-                    wgt_d8d8[0]+=abs(vecs[istate,k])**2                       
-                elif orb1=='d3z2r2' and orb2=='dx2y2' and orb3=='d3z2r2' and orb4=='dx2y2':
-                    wgt_d8d8[1]+=abs(vecs[istate,k])**2 
-                    if S_Ni_12==0 and S_Cu_12==0:
-                        wgt_d8d8[6]+=abs(vecs[istate,k])**2                               
-                    elif S_Ni_12==1 and S_Cu_12==0:
-                        wgt_d8d8[7]+=abs(vecs[istate,k])**2        
-                    elif S_Ni_12==0 and S_Cu_12==1:
-                        wgt_d8d8[8]+=abs(vecs[istate,k])**2                                
-                    elif S_Ni_12==1 and S_Cu_12==1:
-                        wgt_d8d8[9]+=abs(vecs[istate,k])**2 
-                        if s1==s2 and s1==s3:
-                            wgt_d8d8[10]+=abs(vecs[istate,k])**2 
-                        elif s1==s2 and s1!=s3:
-                            wgt_d8d8[11]+=abs(vecs[istate,k])**2                             
-                        elif s1!=s2 and s1==s3:
-                            wgt_d8d8[12]+=abs(vecs[istate,k])**2     
-                        elif s1!=s2 and s1!=s3:
-                            wgt_d8d8[13]+=abs(vecs[istate,k])**2                                 
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z4==2 and z2==z3==z5==0 : 
+                wgt_d9Ld8L[0]+=abs(vecs[istate,k])**2
+                if orb1==orb2==orb3=='dx2y2':
+                    wgt_d9Ld8L[1]+=abs(vecs[istate,k])**2
+                elif orb1==orb3=='dx2y2' and orb2=='d3z2r2':
+                    wgt_d9Ld8L[2]+=abs(vecs[istate,k])**2                    
+                    if S_Cu_12 ==0 and S_Ni_12 ==0: 
+                        wgt_d9Ld8L[3]+=abs(vecs[istate,k])**2 
+                    elif S_Cu_12 ==1: 
+                        wgt_d9Ld8L[4]+=abs(vecs[istate,k])**2   
+                elif orb1==orb2=='d3z2r2' and orb3=='dx2y2':
+                    wgt_d9Ld8L[5]+=abs(vecs[istate,k])**2                          
+                if bonding==0:
+                    wgt_d9Ld8L[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9Ld8L[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9Ld8L[38]+=abs(vecs[istate,k])**2                     
+                    
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==z4==2 and z3==z5==0 : 
+                wgt_d8Ld9L[0]+=abs(vecs[istate,k])**2 
+                if orb1==orb2==orb3=='dx2y2':
+                    wgt_d8Ld9L[1]+=abs(vecs[istate,k])**2
+                elif orb2==orb3=='dx2y2' and orb1=='d3z2r2':
+                    wgt_d8Ld9L[2]+=abs(vecs[istate,k])**2 
+                    if S_Ni_12 ==0 and S_Cu_12 ==0: 
+                        wgt_d8Ld9L[3]+=abs(vecs[istate,k])**2 
+             
+                    elif S_Ni_12 ==1: 
+                        wgt_d8Ld9L[4]+=abs(vecs[istate,k])**2    
+                elif orb1==orb3=='d3z2r2' and orb2=='dx2y2':
+                    wgt_d8Ld9L[5]+=abs(vecs[istate,k])**2  
+                    
+                if bonding==0:
+                    wgt_d8Ld9L[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d8Ld9L[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d8Ld9L[38]+=abs(vecs[istate,k])**2                     
+                    
+            
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z4==z5==2 and z2==z3==0 : 
+                wgt_d9L2d8[0]+=abs(vecs[istate,k])**2 
+                if orb1==orb2==orb3=='dx2y2':
+                    wgt_d9L2d8[1]+=abs(vecs[istate,k])**2
+                elif orb1==orb2=='d3z2r2' and orb3=='dx2y2':
+                    wgt_d9L2d8[2]+=abs(vecs[istate,k])**2                  
+                elif orb1==orb3=='dx2y2' and orb2=='d3z2r2':
+                    wgt_d9L2d8[3]+=abs(vecs[istate,k])**2   
+                    
+                if bonding==0:
+                    wgt_d9L2d8[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9L2d8[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9L2d8[38]+=abs(vecs[istate,k])**2                      
+                    
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==2 and z3==z4==z5==0 : 
+                wgt_d8d9L2[0]+=abs(vecs[istate,k])**2   
+                if orb1==orb2==orb3=='dx2y2':
+                    wgt_d8d9L2[1]+=abs(vecs[istate,k])**2
+                elif orb1==orb3=='d3z2r2' and orb2=='dx2y2':
+                    wgt_d8d9L2[2]+=abs(vecs[istate,k])**2                 
+                elif orb2==orb3=='dx2y2' and orb1=='d3z2r2':
+                    wgt_d8d9L2[3]+=abs(vecs[istate,k])**2    
+                    
+                if bonding==0:
+                    wgt_d8d9L2[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d8d9L2[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d8d9L2[38]+=abs(vecs[istate,k])**2                      
+                    
+                    
+                    
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==2 and z2==z3==z4==z5==0 : 
+                wgt_d9d8L2[0]+=abs(vecs[istate,k])**2  
+                
+                if bonding==0:
+                    wgt_d9d8L2[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9d8L2[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9d8L2[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==2 and z2==z3==z4==z5==0 : 
+                wgt_d9d9L3[0]+=abs(vecs[istate,k])**2  
+                
+                if bonding==0:
+                    wgt_d9d9L3[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9d9L3[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9d9L3[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z3==2 and z2==z4==z5==0 : 
+                wgt_d9Ld9L2[0]+=abs(vecs[istate,k])**2  
+                if orb1==orb2=='dx2y2':
+                    wgt_d9Ld9L2[1]+=abs(vecs[istate,k])**2
+                elif orb1=='d3z2r2' and orb2=='dx2y2':
+                    wgt_d9Ld9L2[2]+=abs(vecs[istate,k])**2
+                elif orb1=='dx2y2' and orb2=='d3z2r2':
+                    wgt_d9Ld9L2[3]+=abs(vecs[istate,k])**2                    
+                elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                    wgt_d9Ld9L2[4]+=abs(vecs[istate,k])**2        
+                    
+                if bonding==0:
+                    wgt_d9Ld9L2[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9Ld9L2[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9Ld9L2[38]+=abs(vecs[istate,k])**2                      
+                    
+                    
+                    
+                    
+                    
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z3==z4==2 and z2==z5==0 : 
+                wgt_d9L2d9L[0]+=abs(vecs[istate,k])**2    
+                if orb1==orb2=='dx2y2':
+                    wgt_d9L2d9L[1]+=abs(vecs[istate,k])**2
+                elif orb1=='d3z2r2' and orb2=='dx2y2':
+                    wgt_d9L2d9L[2]+=abs(vecs[istate,k])**2
+                elif orb1=='dx2y2' and orb2=='d3z2r2':
+                    wgt_d9L2d9L[3]+=abs(vecs[istate,k])**2                    
+                elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                    wgt_d9L2d9L[4]+=abs(vecs[istate,k])**2    
+                    
+                if bonding==0:
+                    wgt_d9L2d9L[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9L2d9L[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9L2d9L[38]+=abs(vecs[istate,k])**2                      
+                    
+                    
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z3==z4==z5==2 and z2==0 : 
+                wgt_d9L3d9[0]+=abs(vecs[istate,k])**2         
+                
+                if bonding==0:
+                    wgt_d9L3d9[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9L3d9[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9L3d9[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==2 and z3==z4==z5==0 : 
+                wgt_d8d10L3[0]+=abs(vecs[istate,k])**2  
+                
+                if bonding==0:
+                    wgt_d8d10L3[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d8d10L3[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d8d10L3[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==z3==2 and z4==z5==0 : 
+                wgt_d8Ld10L2[0]+=abs(vecs[istate,k])**2  
+                
+                if bonding==0:
+                    wgt_d8Ld10L2[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d8Ld10L2[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d8Ld10L2[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==z3==z4==2 and z5==0 : 
+                wgt_d8L2d10L[0]+=abs(vecs[istate,k])**2    
+                
+                if bonding==0:
+                    wgt_d8L2d10L[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d8L2d10L[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d8L2d10L[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==z3==z4==z5==2 : 
+                wgt_d8L3d10[0]+=abs(vecs[istate,k])**2                  
+                
+                if bonding==0:
+                    wgt_d8L3d10[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d8L3d10[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d8L3d10[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==2 and z2==z3==z4==z5==0 : 
+                wgt_d9d10L4[0]+=abs(vecs[istate,k])**2           
+                
+                if bonding==0:
+                    wgt_d9d10L4[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9d10L4[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9d10L4[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+                    
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==2 and z3==z4==z5==0 : 
+                wgt_d9Ld10L3[0]+=abs(vecs[istate,k])**2      
+                
+                if bonding==0:
+                    wgt_d9Ld10L3[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9Ld10L3[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9Ld10L3[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+                    
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==z3==2 and z4==z5==0 : 
+                wgt_d9L2d10L2[0]+=abs(vecs[istate,k])**2     
+                
+                if bonding==0:
+                    wgt_d9L2d10L2[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9L2d10L2[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9L2d10L2[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+                    
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==z3==z4==2 and z5==0 : 
+                wgt_d9L3d10L[0]+=abs(vecs[istate,k])**2    
+                
+                if bonding==0:
+                    wgt_d9L3d10L[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9L3d10L[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9L3d10L[38]+=abs(vecs[istate,k])**2                  
+                
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and  (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs) and z1==z2==z3==z4==z5==2: 
+                wgt_d9L4d10[0]+=abs(vecs[istate,k])**2 
+                
+                if bonding==0:
+                    wgt_d9L4d10[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_d9L4d10[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_d9L4d10[38]+=abs(vecs[istate,k])**2                     
+                
+                
+            elif (orb1 in pam.Obilayer_orbs): 
+                wgt_s[0]+=abs(vecs[istate,k])**2  
+                
+                if bonding==0:
+                    wgt_s[36]+=abs(vecs[istate,k])**2 
+                if bonding==1:
+                    wgt_s[37]+=abs(vecs[istate,k])**2 
+                if bonding==-1:
+                    wgt_s[38]+=abs(vecs[istate,k])**2                    
+                
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Obilayer_orbs): 
+                wgt_ds[0]+=abs(vecs[istate,k])**2   
+                if orb3 in pam.Obilayer_orbs:
+                    wgt_ds[1]+=abs(vecs[istate,k])**2 
+                    if z1==2 and z4==2 and z5==2:
+                        wgt_ds[3]+=abs(vecs[istate,k])**2*2 
+                        if orb1=='dx2y2':
+                            wgt_ds[9]+=abs(vecs[istate,k])**2*2  
+                    if z1==2 and z4==2 and z5==0:
+                        wgt_ds[4]+=abs(vecs[istate,k])**2*2 
+                        if orb1=='dx2y2':
+                            wgt_ds[10]+=abs(vecs[istate,k])**2 *2                         
+                    if z1==2 and z4==0 and z5==0:
+                        wgt_ds[5]+=abs(vecs[istate,k])**2*2                              
+                        if orb1=='dx2y2':
+                            wgt_ds[11]+=abs(vecs[istate,k])**2*2                          
+                    
+                elif orb3 in pam.O_orbs:
+                    wgt_ds[2]+=abs(vecs[istate,k])**2  
+                    if z1==2 and z3==2 and z4==2 and z5==0:
+                        wgt_ds[6]+=abs(vecs[istate,k])**2*2  
+                        if orb1=='dx2y2':
+                            wgt_ds[12]+=abs(vecs[istate,k])**2*2                               
+                    if z1==2 and z3==2 and z4==0 and z5==0:
+                        wgt_ds[7]+=abs(vecs[istate,k])**2*2   
+                        if orb1=='dx2y2':
+                            wgt_ds[13]+=abs(vecs[istate,k])**2*2                               
+                    if z1==2 and z3==0 and z4==0 and z5==0:
+                        wgt_ds[8]+=abs(vecs[istate,k])**2*2                         
+                        if orb1=='dx2y2':
+                            wgt_ds[14]+=abs(vecs[istate,k])**2 *2    
                             
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and orb3=='dx2y2' and orb4=='dx2y2':
-                    wgt_d8d8[2]+=abs(vecs[istate,k])**2                          
-                elif orb1=='dx2y2' and orb2=='dx2y2'  and orb3=='dx2y2' and orb4=='dx2y2':
-                    wgt_d8d8[3]+=abs(vecs[istate,k])**2  
-                elif orb1=='d3z2r2' and orb2=='dx2y2'  and orb3=='dx2y2' and orb4=='dx2y2':
-                    wgt_d8d8[4]+=abs(vecs[istate,k])**2                  
-                elif orb1=='d3z2r2' and orb2=='d3z2r2' and orb3=='d3z2r2' and orb4=='d3z2r2':
-                    wgt_d8d8[5]+=abs(vecs[istate,k])**2  
                 if bonding==0:
-                    wgt_d8d8[46]+=abs(vecs[istate,k])**2 
+                    wgt_ds[36]+=abs(vecs[istate,k])**2 
                 if bonding==1:
-                    wgt_d8d8[47]+=abs(vecs[istate,k])**2 
+                    wgt_ds[37]+=abs(vecs[istate,k])**2 
                 if bonding==-1:
-                    wgt_d8d8[48]+=abs(vecs[istate,k])**2 
+                    wgt_ds[38]+=abs(vecs[istate,k])**2                                
+                            
+                            
+                
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Obilayer_orbs): 
+                wgt_dds[0]+=abs(vecs[istate,k])**2       
+                if (orb4 in pam.Obilayer_orbs) and (orb5 in pam.O_orbs):
+                    wgt_dds[1]+=abs(vecs[istate,k])**2
+                    if z1==z2==2:
+                        wgt_dds[3]+=abs(vecs[istate,k])**2
+                        if z4==z5==2:
+                            wgt_dds[57]+=abs(vecs[istate,k])**2
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[9]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[10]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[11]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[12]+=abs(vecs[istate,k])**2                              
+                        elif z4==2 and z5==0:
+                            wgt_dds[58]+=abs(vecs[istate,k])**2                           
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[33]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[34]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[35]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[36]+=abs(vecs[istate,k])**2       
+                                
+                    if z1==2 and z2==0:
+                        wgt_dds[4]+=abs(vecs[istate,k])**2 
+                        if z4==z5==2:
+                            wgt_dds[59]+=abs(vecs[istate,k])**2
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[13]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[14]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[15]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[16]+=abs(vecs[istate,k])**2                                
+                        elif z4==2 and z5==0:
+                            wgt_dds[60]+=abs(vecs[istate,k])**2                           
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[37]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[38]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[39]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[40]+=abs(vecs[istate,k])**2                          
+                    if z1==0 and z2==0:
+                        wgt_dds[5]+=abs(vecs[istate,k])**2   
+                        if z4==z5==2:
+                            wgt_dds[61]+=abs(vecs[istate,k])**2
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[17]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[18]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[19]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[20]+=abs(vecs[istate,k])**2                                  
+                        elif z4==2 and z5==0:
+                            wgt_dds[62]+=abs(vecs[istate,k])**2                           
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[41]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[42]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[43]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[44]+=abs(vecs[istate,k])**2   
+                                
+                    if bonding==0:
+                        wgt_dds[73]+=abs(vecs[istate,k])**2 
+                    if bonding==1:
+                        wgt_dds[74]+=abs(vecs[istate,k])**2 
+                    if bonding==-1:
+                        wgt_dds[75]+=abs(vecs[istate,k])**2                                    
+                            
+                if (orb4 in pam.O_orbs) and (orb5 in pam.O_orbs):
+                    wgt_dds[2]+=abs(vecs[istate,k])**2        
+                    if z1==z2==2:
+                        wgt_dds[6]+=abs(vecs[istate,k])**2
+                        if z4==z5==2:
+                            wgt_dds[63]+=abs(vecs[istate,k])**2
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[21]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[22]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[23]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[24]+=abs(vecs[istate,k])**2                              
+                        elif z4==2 and z5==0:
+                            wgt_dds[64]+=abs(vecs[istate,k])**2                            
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[45]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[46]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[47]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[48]+=abs(vecs[istate,k])**2  
+                    if z1==2 and z2==0:
+                        wgt_dds[7]+=abs(vecs[istate,k])**2 
+                        if z4==z5==2:
+                            wgt_dds[65]+=abs(vecs[istate,k])**2
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[25]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[26]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[27]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[28]+=abs(vecs[istate,k])**2                                               
+                        elif z4==2 and z5==0:
+                            wgt_dds[66]+=abs(vecs[istate,k])**2                           
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[49]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[50]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[51]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[52]+=abs(vecs[istate,k])**2      
+                                
+                    if z1==0 and z2==0:
+                        wgt_dds[8]+=abs(vecs[istate,k])**2  
+                        if z4==z5==2:
+                            wgt_dds[67]+=abs(vecs[istate,k])**2
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[29]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[30]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[31]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[32]+=abs(vecs[istate,k])**2                                 
+                        elif z4==2 and z5==0:
+                            wgt_dds[68]+=abs(vecs[istate,k])**2                           
+                            if orb1==orb2=='dx2y2':
+                                wgt_dds[53]+=abs(vecs[istate,k])**2
+                            elif orb1=='d3z2r2' and orb2=='dx2y2':
+                                wgt_dds[54]+=abs(vecs[istate,k])**2
+                            elif orb1=='dx2y2' and orb2=='d3z2r2':
+                                wgt_dds[55]+=abs(vecs[istate,k])**2                    
+                            elif orb1=='d3z2r2' and orb2=='d3z2r2':
+                                wgt_dds[56]+=abs(vecs[istate,k])**2                       
+                    
+                    if bonding==0:
+                        wgt_dds[76]+=abs(vecs[istate,k])**2 
+                    if bonding==1:
+                        wgt_dds[77]+=abs(vecs[istate,k])**2 
+                    if bonding==-1:
+                        wgt_dds[78]+=abs(vecs[istate,k])**2    
                     
                     
                     
-                    
-                    
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs):
-                wgt_d8d8[14]+=abs(vecs[istate,k])**2 
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==2 and z3==z4==0:
-                wgt_d9Ld10L2[12]+=abs(vecs[istate,k])**2
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==2 and z2==z3==z4==0:
-                wgt_d9d10L3[8]+=abs(vecs[istate,k])**2    
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==0 and z2==z3==z4==2:
-                wgt_d10L3d9[10]+=abs(vecs[istate,k])**2                    
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==z3==2 and z4==0:
-                wgt_d9L2d10L[8]+=abs(vecs[istate,k])**2
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z2==2 and z1==z3==z4==0:
-                wgt_d10Ld9L2[8]+=abs(vecs[istate,k])**2      
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==z3==z4==0:
-                wgt_d10d9L3[8]+=abs(vecs[istate,k])**2                     
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.O_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z2==z3==2 and z1==z4==0:
-                wgt_d10L2d9L[8]+=abs(vecs[istate,k])**2  
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==z3==2 and z4==0:
-                wgt_d8Ld10L[8]+=abs(vecs[istate,k])**2                  
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==2 and z3==z4==0:
-                wgt_d8d10L2[8]+=abs(vecs[istate,k])**2  
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z3==2 and z1==z2==z4==0:
-                wgt_d10Ld8L[8]+=abs(vecs[istate,k])**2                  
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==z3==z4==0:
-                wgt_d10d8L2[8]+=abs(vecs[istate,k])**2                  
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==z3==z4==2:
-                wgt_d8L2d10[8]+=abs(vecs[istate,k])**2                   
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z3==z4==2 and z1==z2==0:
-                wgt_d10L2d8[8]+=abs(vecs[istate,k])**2                    
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z3==z4==2 and z2==0:
-                wgt_d9L2d9[12]+=abs(vecs[istate,k])**2                  
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==2 and z2==z3==z4==0:
-                wgt_d9d9L2[8]+=abs(vecs[istate,k])**2                   
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z3==2 and z2==z4==0:
-                wgt_d9Ld9L[38]+=abs(vecs[istate,k])**2                     
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) \
-                and z1==2 and z2==z3==z4==0:
-                wgt_d9d8L[8]+=abs(vecs[istate,k])**2   
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==2 and z3==z4==0:
-                wgt_d8d9L[31]+=abs(vecs[istate,k])**2                   
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z4==2 and z2==z3==0:
-                wgt_d9Ld8[8]+=abs(vecs[istate,k])**2                   
-            if (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.O_orbs) \
-                and z1==z2==z4==2 and z3==0:
-                wgt_d8Ld9[8]+=abs(vecs[istate,k])**2                   
 
-#             if (orb1 =='dx2y2') and (orb2 =='dx2y2') and (orb3 in pam.O_orbs) and (orb4 in pam.O_orbs) \
-#                 and z1==z3==1 and z2==z4==0:
-#                 print (' state ', i, ' ',orb1,s1,x1,y1,z1,' ',orb2,s2,x2,y2,z2,' ',orb3,s3,x3,y3,z3,' ',orb4,s4,x4,y4,z4,\
-#                        '\n S_Ni=', S_Ni_12, ',  Sz_Ni=', Sz_Ni_12, \
-#                        ',  S_Cu=', S_Cu_12, ',  Sz_Cu=', Sz_Cu_12, \
-#                        ", weight = ", weight,'\n')  
-#                 if S_Ni_12==1 and S_Cu_12==1:
-#                     s11+=abs(vecs[istate,k])**2 
-#                 if S_Ni_12==1 and S_Cu_12==0:
-#                     s10+=abs(vecs[istate,k])**2                     
-#                 if S_Ni_12==0 and S_Cu_12==1:
-#                     s01+=abs(vecs[istate,k])**2                     
-#                 if S_Ni_12==0 and S_Cu_12==0:
-#                     s00+=abs(vecs[istate,k])**2 
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Obilayer_orbs): 
+                wgt_ddds[0]+=abs(vecs[istate,k])**2  
+                if orb5 in pam.Obilayer_orbs:
+                    wgt_ddds[1]+=abs(vecs[istate,k])**2 
+                    if z1==z2==2 and z3==0:
+                        wgt_ddds[3]+=abs(vecs[istate,k])**2
+                        if orb1==orb2==orb3=='dx2y2':
+                            wgt_ddds[7]+=abs(vecs[istate,k])**2 
+                        elif orb1=='d3z2r2' and orb2==orb3=='dx2y2':
+                            wgt_ddds[8]+=abs(vecs[istate,k])**2                             
+                        elif orb1==orb3=='d3z2r2' and orb2=='dx2y2':
+                            wgt_ddds[9]+=abs(vecs[istate,k])**2  
+                           
+                            
+                            
+                    if z1==2 and z2==z3==0:
+                        wgt_ddds[4]+=abs(vecs[istate,k])**2                                                  
+                        if orb1==orb2==orb3=='dx2y2':
+                            wgt_ddds[10]+=abs(vecs[istate,k])**2 
+                        elif orb2=='d3z2r2' and orb1==orb3=='dx2y2':
+                            wgt_ddds[11]+=abs(vecs[istate,k])**2                             
+                        elif orb1==orb2=='d3z2r2' and orb3=='dx2y2':
+                            wgt_ddds[12]+=abs(vecs[istate,k])**2 
+                            
+                    if bonding==0:
+                        wgt_ddds[73]+=abs(vecs[istate,k])**2 
+                    if bonding==1:
+                        wgt_ddds[74]+=abs(vecs[istate,k])**2 
+                    if bonding==-1:
+                        wgt_ddds[75]+=abs(vecs[istate,k])**2                                    
+                            
+                if orb5 in pam.O_orbs:
+                    wgt_ddds[2]+=abs(vecs[istate,k])**2                 
+                    if z1==z2==2 and z3==0:
+                        wgt_ddds[5]+=abs(vecs[istate,k])**2  
+                        if orb1==orb2==orb3=='dx2y2':
+                            wgt_ddds[13]+=abs(vecs[istate,k])**2 
+                        elif orb1=='d3z2r2' and orb2==orb3=='dx2y2':
+                            wgt_ddds[14]+=abs(vecs[istate,k])**2                             
+                        elif orb1==orb3=='d3z2r2' and orb2=='dx2y2':
+                            wgt_ddds[15]+=abs(vecs[istate,k])**2  
+                        if z5==2:
+                            wgt_ddds[19]+=abs(vecs[istate,k])**2*2  
+                        if z5==0:
+                            wgt_ddds[20]+=abs(vecs[istate,k])**2*2      
+                            
+                            
+                            
+                        
+                    if z1==2 and z2==z3==0:
+                        wgt_ddds[6]+=abs(vecs[istate,k])**2                       
+                        if orb1==orb2==orb3=='dx2y2':
+                            wgt_ddds[16]+=abs(vecs[istate,k])**2 
+                        elif orb2=='d3z2r2' and orb1==orb3=='dx2y2':
+                            wgt_ddds[17]+=abs(vecs[istate,k])**2                             
+                        elif orb1==orb2=='d3z2r2' and orb3=='dx2y2':
+                            wgt_ddds[18]+=abs(vecs[istate,k])**2         
+                            
+                            
+                    if bonding==0:
+                        wgt_ddds[76]+=abs(vecs[istate,k])**2 
+                    if bonding==1:
+                        wgt_ddds[77]+=abs(vecs[istate,k])**2 
+                    if bonding==-1:
+                        wgt_ddds[78]+=abs(vecs[istate,k])**2                             
+                            
+                            
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.Obilayer_orbs): 
+                wgt_dddds[0]+=abs(vecs[istate,k])**2                  
+                if orb1==orb2==orb3==orb4=='dx2y2':
+                    wgt_dddds[1]+=abs(vecs[istate,k])**2  
+                if orb1==orb3=='d3z2r2' and orb2==orb4=='dx2y2':
+                    wgt_dddds[2]+=abs(vecs[istate,k])**2                  
+                if orb1=='d3z2r2' and orb2==orb3==orb4=='dx2y2':
+                    wgt_dddds[3]+=abs(vecs[istate,k])**2   
+                if orb3=='d3z2r2' and orb1==orb2==orb4=='dx2y2':
+                    wgt_dddds[4]+=abs(vecs[istate,k])**2                     
+                if orb1==orb2==orb3==orb4=='d3z2r2':
+                    wgt_dddds[5]+=abs(vecs[istate,k])**2  
                     
-            if (orb1 in pam.Obilayer_orbs) or (orb2 in pam.Obilayer_orbs) or (orb3 in pam.Obilayer_orbs) or (orb4 in pam.Obilayer_orbs):
-                wgt_H[0]+=abs(vecs[istate,k])**2    
-                
-                
-            if (orb1 in pam.Obilayer_orbs):    
-                wgt_s[0]+=abs(vecs[istate,k])**2      
                 if bonding==0:
-                    wgt_s[46]+=abs(vecs[istate,k])**2 
+                    wgt_dddds[76]+=abs(vecs[istate,k])**2 
                 if bonding==1:
-                    wgt_s[47]+=abs(vecs[istate,k])**2 
+                    wgt_dddds[77]+=abs(vecs[istate,k])**2 
                 if bonding==-1:
-                    wgt_s[48]+=abs(vecs[istate,k])**2                 
-                
-                
-                
-            elif (orb1 in pam.Ni_Cu_orbs and orb2 in pam.Ni_Cu_orbs and orb3 in pam.Obilayer_orbs and orb4 in pam.Obilayer_orbs): 
-                wgt_ddss[0]+=abs(vecs[istate,k])**2  
-                if z1==z2==2:
-                    wgt_ddss[1]+=abs(vecs[istate,k])**2 
-                    if orb1=='d3z2r2' and orb2=='d3z2r2':
-                        wgt_ddss[4]+=abs(vecs[istate,k])**2  
-                    elif orb1=='d3z2r2' and orb2=='dx2y2':
-                        wgt_ddss[5]+=abs(vecs[istate,k])**2                          
-                    elif orb1=='dx2y2' and orb2=='dx2y2':
-                        wgt_ddss[6]+=abs(vecs[istate,k])**2                                                   
-                elif z1==z2==0:
-                    wgt_ddss[2]+=abs(vecs[istate,k])**2  
-                    if orb1=='d3z2r2' and orb2=='d3z2r2':
-                        wgt_ddss[7]+=abs(vecs[istate,k])**2  
-                    elif orb1=='d3z2r2' and orb2=='dx2y2':
-                        wgt_ddss[8]+=abs(vecs[istate,k])**2                          
-                    elif orb1=='dx2y2' and orb2=='dx2y2':
-                        wgt_ddss[9]+=abs(vecs[istate,k])**2                        
-                elif z1==2 and z2==0:
-                    wgt_ddss[3]+=abs(vecs[istate,k])**2  
-                    if orb1=='d3z2r2' and orb2=='d3z2r2':
-                        wgt_ddss[10]+=abs(vecs[istate,k])**2  
-                    elif orb1=='d3z2r2' and orb2=='dx2y2':
-                        wgt_ddss[11]+=abs(vecs[istate,k])**2                          
-                    elif orb1=='dx2y2' and orb2=='dx2y2':
-                        wgt_ddss[12]+=abs(vecs[istate,k])**2  
-                if bonding==0:
-                    wgt_ddss[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_ddss[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_ddss[48]+=abs(vecs[istate,k])**2                         
-                        
-                        
-                        
+                    wgt_dddds[78]+=abs(vecs[istate,k])**2                     
                     
-            elif (orb1 in pam.Ni_Cu_orbs and orb2 in pam.Ni_Cu_orbs and orb3 in pam.Obilayer_orbs and orb4 in pam.O_orbs): 
-                wgt_ddsp[0]+=abs(vecs[istate,k])**2   
-                if z1==z2==2:
-                    wgt_ddsp[1]+=abs(vecs[istate,k])**2 
-                    if orb1=='d3z2r2' and orb2=='d3z2r2':
-                        wgt_ddsp[4]+=abs(vecs[istate,k])**2  
-                    elif orb1=='d3z2r2' and orb2=='dx2y2':
-                        wgt_ddsp[5]+=abs(vecs[istate,k])**2                          
-                    elif orb1=='dx2y2' and orb2=='dx2y2':
-                        wgt_ddsp[6]+=abs(vecs[istate,k])**2                                                   
-                elif z1==z2==0:
-                    wgt_ddsp[2]+=abs(vecs[istate,k])**2  
-                    if orb1=='d3z2r2' and orb2=='d3z2r2':
-                        wgt_ddsp[7]+=abs(vecs[istate,k])**2  
-                    elif orb1=='d3z2r2' and orb2=='dx2y2':
-                        wgt_ddsp[8]+=abs(vecs[istate,k])**2                          
-                    elif orb1=='dx2y2' and orb2=='dx2y2':
-                        wgt_ddsp[9]+=abs(vecs[istate,k])**2                        
-                elif z1==2 and z2==0:
-                    wgt_ddsp[3]+=abs(vecs[istate,k])**2 
-                    if z4==2:
-                        wgt_ddsp[17]+=abs(vecs[istate,k])**2
-                    if z4==0:
-                        wgt_ddsp[18]+=abs(vecs[istate,k])**2                        
-                    if orb1=='d3z2r2' and orb2=='d3z2r2':
-                        wgt_ddsp[10]+=abs(vecs[istate,k])**2  
-                    elif orb1=='d3z2r2' and orb2=='dx2y2':
-                        wgt_ddsp[11]+=abs(vecs[istate,k])**2 
-                        if z4==2:
-                            wgt_ddsp[13]+=abs(vecs[istate,k])**2  
-                            if S_Ni_12==1:
-                                 wgt_ddsp[15]+=abs(vecs[istate,k])**2
-                            if S_Ni_12==0:
-                                 wgt_ddsp[16]+=abs(vecs[istate,k])**2                                  
-                        if z4==0:
-                            wgt_ddsp[14]+=abs(vecs[istate,k])**2                              
-                    elif orb1=='dx2y2' and orb2=='dx2y2':
-                        wgt_ddsp[12]+=abs(vecs[istate,k])**2     
-                if bonding==0:
-                    wgt_ddsp[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_ddsp[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_ddsp[48]+=abs(vecs[istate,k])**2                         
-                        
-                        
-                        
-                        
-            elif (orb1 in pam.Ni_Cu_orbs and orb2 in pam.Obilayer_orbs and orb3 in pam.Obilayer_orbs): 
-                wgt_dssp[0]+=abs(vecs[istate,k])**2   
-                if z1==2 and z4==2:
-                    wgt_dssp[1]+=abs(vecs[istate,k])**2
-                    if orb1=='d3z2r2':
-                        wgt_dssp[3]+=abs(vecs[istate,k])**2                        
-                    elif orb1=='dx2y2':
-                        wgt_dssp[4]+=abs(vecs[istate,k])**2                        
-                elif z1==2 and z4==0:
-                    wgt_dssp[2]+=abs(vecs[istate,k])**2
-                    if orb1=='d3z2r2':
-                        wgt_dssp[5]+=abs(vecs[istate,k])**2                        
-                    elif orb1=='dx2y2':
-                        wgt_dssp[6]+=abs(vecs[istate,k])**2      
-                if bonding==0:
-                    wgt_dssp[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_dssp[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_dssp[48]+=abs(vecs[istate,k])**2                         
-                        
-                        
-                    
-                
-            elif (orb1 in pam.Ni_Cu_orbs and orb2 in pam.Obilayer_orbs and orb3 in pam.O_orbs): 
-                wgt_dspp[0]+=abs(vecs[istate,k])**2                
-                if z1==2 and z3==2 and z4==0:
-                    wgt_dspp[1]+=abs(vecs[istate,k])**2
-                    if orb1=='d3z2r2':
-                        wgt_dspp[3]+=abs(vecs[istate,k])**2                        
-                    elif orb1=='dx2y2':
-                        wgt_dspp[4]+=abs(vecs[istate,k])**2                        
-                elif z1==2 and z3==0 and z4==0:
-                    wgt_dspp[2]+=abs(vecs[istate,k])**2
-                    if orb1=='d3z2r2':
-                        wgt_dspp[5]+=abs(vecs[istate,k])**2                        
-                    elif orb1=='dx2y2':
-                        wgt_dspp[6]+=abs(vecs[istate,k])**2   
-                if bonding==0:
-                    wgt_dspp[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_dspp[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_dspp[48]+=abs(vecs[istate,k])**2                         
-                        
-                        
-                
-            elif (orb1 in pam.Ni_Cu_orbs and orb2 in pam.Ni_Cu_orbs and orb3 in pam.Ni_Cu_orbs and orb4 in pam.Obilayer_orbs): 
-                wgt_ddds[0]+=abs(vecs[istate,k])**2 
-                if z1==z2==2 and z3==0:
-                    wgt_ddds[1]+=abs(vecs[istate,k])**2        
-                    if orb1=='d3z2r2' and orb2=='d3z2r2' and orb3=='d3z2r2':
-                        wgt_ddds[3]+=abs(vecs[istate,k])**2       
-                    elif orb1=='d3z2r2' and orb2=='dx2y2' and orb3=='d3z2r2':
-                        wgt_ddds[4]+=abs(vecs[istate,k])**2                               
-                    elif orb1=='dx2y2' and orb2=='dx2y2' and orb3=='d3z2r2':
-                        wgt_ddds[5]+=abs(vecs[istate,k])**2                             
-                    elif orb1=='d3z2r2' and orb2=='d3z2r2' and orb3=='dx2y2':
-                        wgt_ddds[6]+=abs(vecs[istate,k])**2       
-                    elif orb1=='d3z2r2' and orb2=='dx2y2' and orb3=='dx2y2':
-                        wgt_ddds[7]+=abs(vecs[istate,k])**2
-                        if S_Ni_12==1:
-                             wgt_ddds[15]+=abs(vecs[istate,k])**2
-                        if S_Ni_12==0:
-                             wgt_ddds[16]+=abs(vecs[istate,k])**2                                
-                    elif orb1=='dx2y2' and orb2=='dx2y2' and orb3=='dx2y2':
-                        wgt_ddds[8]+=abs(vecs[istate,k])**2                          
-                elif z1==2 and z3==z2==0:
-                    wgt_ddds[2]+=abs(vecs[istate,k])**2          
-                    if orb1=='d3z2r2' and orb2=='d3z2r2' and orb3=='d3z2r2':
-                        wgt_ddds[9]+=abs(vecs[istate,k])**2                         
-                    elif orb1=='d3z2r2' and orb2=='d3z2r2' and orb3=='dx2y2':
-                        wgt_ddds[10]+=abs(vecs[istate,k])**2                        
-                    elif orb1=='d3z2r2' and orb2=='dx2y2' and orb3=='dx2y2':
-                        wgt_ddds[11]+=abs(vecs[istate,k])**2  
-                    elif orb1=='dx2y2' and orb2=='d3z2r2' and orb3=='d3z2r2':
-                        wgt_ddds[12]+=abs(vecs[istate,k])**2                         
-                    elif orb1=='dx2y2' and orb2=='d3z2r2' and orb3=='dx2y2':
-                        wgt_ddds[13]+=abs(vecs[istate,k])**2                        
-                    elif orb1=='dx2y2' and orb2=='dx2y2' and orb3=='dx2y2':
-                        wgt_ddds[14]+=abs(vecs[istate,k])**2                          
-                if bonding==0:
-                    wgt_ddds[46]+=abs(vecs[istate,k])**2 
-                if bonding==1:
-                    wgt_ddds[47]+=abs(vecs[istate,k])**2 
-                if bonding==-1:
-                    wgt_ddds[48]+=abs(vecs[istate,k])**2                         
-                        
-                
+
             sumweight=sumweight+abs(vecs[istate,k])**2
 
+    print ('sumweight=',sumweight/number)
+    print ('LmLn=',wgt_LmLn[0]/number,'  bonding0=',wgt_LmLn[36]/number,'  bonding1=',wgt_LmLn[37]/number,'  bonding-1=',wgt_LmLn[38]/number)
+    print ('d8d8L=',wgt_d8d8L[0]/number+wgt_d8Ld8[0]/number,'  bonding0=',wgt_d8d8L[36]/number+wgt_d8Ld8[36]/number,'  bonding1=',wgt_d8d8L[37]/number+wgt_d8Ld8[37]/number,'  bonding-1=',wgt_d8d8L[38]/number+wgt_d8Ld8[38]/number)
+    print ('d9Ld8L=',wgt_d9Ld8L[0]/number+wgt_d8Ld9L[0]/number,'  bonding0=',wgt_d9Ld8L[36]/number+wgt_d8Ld9L[36]/number,'  bonding1=',wgt_d9Ld8L[37]/number+wgt_d8Ld9L[37]/number,'  bonding-1=',wgt_d9Ld8L[38]/number+wgt_d8Ld9L[38]/number) 
       
+#     print ('d9d8L2=',wgt_d9d8L2[0]/number,'  bonding0=',wgt_d9d8L2[36]/number,'  bonding1=',wgt_d9d8L2[37]/number,'  bonding-1=',wgt_d9d8L2[38]/number)          
+    print ('d9L2d8=',wgt_d9L2d8[0]/number+wgt_d8d9L2[0]/number,'  bonding0=',wgt_d9L2d8[36]/number+wgt_d8d9L2[36]/number,'  bonding1=',wgt_d9L2d8[37]/number+wgt_d8d9L2[37]/number,'  bonding-1=',wgt_d9L2d8[38]/number+wgt_d8d9L2[38]/number) 
+       
+    print ('d9L3d9=',wgt_d9L3d9[0]/number+wgt_d9d9L3[0]/number,'  bonding0=',wgt_d9L3d9[36]/number+wgt_d9d9L3[36]/number,'  bonding1=',wgt_d9L3d9[37]/number+wgt_d9d9L3[37]/number,'  bonding-1=',wgt_d9L3d9[38]/number+wgt_d9d9L3[38]/number) 
+    print ('d9L2d9L=',wgt_d9L2d9L[0]/number+wgt_d9Ld9L2[0]/number,'  bonding0=',wgt_d9L2d9L[36]/number+wgt_d9Ld9L2[36]/number,'  bonding1=',wgt_d9L2d9L[37]/number+wgt_d9Ld9L2[37]/number,'  bonding-1=',wgt_d9L2d9L[38]/number+wgt_d9Ld9L2[38]/number)         
+
+#     print ('d8L3d10=',wgt_d8L3d10[0]/number,'  bonding0=',wgt_d8L3d10[36]/number,'  bonding1=',wgt_d8L3d10[37]/number,'  bonding-1=',wgt_d8L3d10[38]/number) 
+#     print ('d8L2d10L=',wgt_d8L2d10L[0]/number,'  bonding0=',wgt_d8L2d10L[36]/number,'  bonding1=',wgt_d8L2d10L[37]/number,'  bonding-1=',wgt_d8L2d10L[38]/number)         
+#     print ('d8Ld10L2=',wgt_d8Ld10L2[0]/number,'  bonding0=',wgt_d8Ld10L2[36]/number,'  bonding1=',wgt_d8Ld10L2[37]/number,'  bonding-1=',wgt_d8Ld10L2[38]/number)         
+#     print ('d8d10L3=',wgt_d8d10L3[0]/number,'  bonding0=',wgt_d8d10L3[36]/number,'  bonding1=',wgt_d8d10L3[37]/number,'  bonding-1=',wgt_d8d10L3[38]/number)  
+#     print ('d9d10L4=',wgt_d9d10L4[0]/number,'  bonding0=',wgt_d9d10L4[36]/number,'  bonding1=',wgt_d9d10L4[37]/number,'  bonding-1=',wgt_d9d10L4[38]/number)          
+#     print ('d9Ld10L3=',wgt_d9Ld10L3[0]/number,'  bonding0=',wgt_d9Ld10L3[36]/number,'  bonding1=',wgt_d9Ld10L3[37]/number,'  bonding-1=',wgt_d9Ld10L3[38]/number)         
+#     print ('d9L2d10L2=',wgt_d9L2d10L2[0]/number,'  bonding0=',wgt_d9L2d10L2[36]/number,'  bonding1=',wgt_d9L2d10L2[37]/number,'  bonding-1=',wgt_d9L2d10L2[38]/number)         
+#     print ('d9L3d10L=',wgt_d9L3d10L[0]/number,'  bonding0=',wgt_d9L3d10L[36]/number,'  bonding1=',wgt_d9L3d10L[37]/number,'  bonding-1=',wgt_d9L3d10L[38]/number) 
+#     print ('d9L4d10=',wgt_d9L4d10[0]/number,'  bonding0=',wgt_d9L4d10[36]/number,'  bonding1=',wgt_d9L4d10[37]/number,'  bonding-1=',wgt_d9L4d10[38]/number) 
+    print ('s=',wgt_s[0]/number,'  bonding0=',wgt_s[36]/number,'  bonding1=',wgt_s[37]/number,'  bonding-1=',wgt_s[38]/number) 
+    
+    print ('d9-O2-L2 + d9L-O2-L + d9L2-O2=',wgt_ds[1]/number,'  bonding0=',wgt_ds[33]/number,'  bonding1=',wgt_ds[34]/number,'  bonding-1=',wgt_ds[35]/number)        
+    print ('d9-O-L3 + d9L-O-L2 + d9L2-O-L + d9L3-O=',wgt_ds[2]/number,'  bonding0=',wgt_ds[36]/number,'  bonding1=',wgt_ds[37]/number,'  bonding-1=',wgt_ds[38]/number)             
+    print ('d8-O2-L + d8L-O2 + d9-O2-L2 + d9L-O2-L + d9L2-O2=',wgt_dds[1]/number,'  bonding0=',wgt_dds[73]/number,'  bonding1=',wgt_dds[74]/number,'  bonding-1=',wgt_dds[75]/number)  
+    print ('d8-O-L2 + d8L-O-L + d8L2-O + d9-O-d9L2 + d9L-O-d9L=',wgt_dds[2]/number,'  bonding0=',wgt_dds[76]/number,'  bonding1=',wgt_dds[77]/number,'  bonding-1=',wgt_dds[78]/number)  
+    print ('d8-O2-d9=',wgt_ddds[1]/number,'  bonding0=',wgt_ddds[73]/number,'  bonding1=',wgt_ddds[74]/number,'  bonding-1=',wgt_ddds[75]/number) 
+    print ('d8L-O-d9 + d8-O-d9L=',wgt_ddds[2]/number,'  bonding0=',wgt_ddds[76]/number,'  bonding1=',wgt_ddds[77]/number,'  bonding-1=',wgt_ddds[78]/number)  
+    print ('d8-O-d8=',wgt_dddds[0]/number,'  bonding0=',wgt_dddds[76]/number,'  bonding1=',wgt_dddds[77]/number,'  bonding-1=',wgt_dddds[78]/number)   
+
+    print ('test[0]=',test[0]/number)     
+    print ('test[1]=',test[1]/number)        
+    print ('test[2]=',test[2]/number)        
+    print ('test[3]=',test[3]/number)  
+    print ('test[4]=',test[4]/number)        
+    print ('test[5]=',test[5]/number)      
+    print ('test[6]=',test[6]/number)  
+    print ('test[7]=',test[7]/number)        
+    print ('test[8]=',test[8]/number)          
+    
+    
+    sumweight2 = wgt_LmLn[0]+wgt_d8Ld8[0]+wgt_d8d8L[0]+wgt_d9Ld8L[0]+wgt_d8Ld9L[0]+wgt_d9d8L2[0]+wgt_d9L2d8[0]+wgt_d8d9L2[0]\
+             +wgt_d9L3d9[0]+wgt_d9L2d9L[0]+wgt_d9Ld9L2[0]+wgt_d9d9L3[0]+wgt_d8L3d10[0]+wgt_d8L2d10L[0]\
+             +wgt_d8Ld10L2[0]+wgt_d8d10L3[0]+wgt_d9d10L4[0]+wgt_d9Ld10L3[0]+wgt_d9L2d10L2[0]+wgt_d9L3d10L[0]+wgt_d9L4d10[0]
+    print ('sumweight2=',sumweight2/number)
 #         print ('s11=',s11)        
 #         print ('s10=',s10)       
 #         print ('s01=',s01)  
 #         print ('s00=',s00)          
 
 
-        wgt_d9Ld10L2[13]=wgt_d9Ld10L2[0]+wgt_d9Ld10L2[1]        
-        wgt_d9d10L3[2]=wgt_d9d10L3[0]+wgt_d9d10L3[1]          
-        wgt_d9L2d10L[2]=wgt_d9L2d10L[0]+wgt_d9L2d10L[1]        
-        wgt_d10Ld9L2[2]=wgt_d10Ld9L2[0]+wgt_d10Ld9L2[1]  
-        wgt_d10d9L3[2]=wgt_d10d9L3[0]+wgt_d10d9L3[1]        
-        wgt_d10L2d9L[2]=wgt_d10L2d9L[0]+wgt_d10L2d9L[1]          
-        wgt_d8Ld10L[4]=wgt_d8Ld10L[0]+wgt_d8Ld10L[1]+wgt_d8Ld10L[2]+wgt_d8Ld10L[3]        
-        wgt_d10Ld8L[4]=wgt_d10Ld8L[0]+wgt_d10Ld8L[1]+wgt_d10Ld8L[2]+wgt_d10Ld8L[3]    
-        wgt_d8d10L2[4]=wgt_d8d10L2[0]+wgt_d8d10L2[1]+wgt_d8d10L2[2]+wgt_d8d10L2[3]          
-        wgt_d10d8L2[4]=wgt_d10d8L2[0]+wgt_d10d8L2[1]+wgt_d10d8L2[2]+wgt_d10d8L2[3]            
-        wgt_d8L2d10[4]=wgt_d8L2d10[0]+wgt_d8L2d10[1]+wgt_d8L2d10[2]+wgt_d8L2d10[3]          
-        wgt_d10L2d8[4]=wgt_d10L2d8[0]+wgt_d10L2d8[1]+wgt_d10L2d8[2]+wgt_d10L2d8[3]            
-        wgt_d9L2d9[13]=wgt_d9L2d9[0]+wgt_d9L2d9[1]+wgt_d9L2d9[2]+wgt_d9L2d9[3]
-        wgt_d9d9L2[4]=wgt_d9d9L2[0]+wgt_d9d9L2[1]+wgt_d9d9L2[2]+wgt_d9d9L2[3]
-        wgt_d9Ld9L[39]=wgt_d9Ld9L[0]+wgt_d9Ld9L[1]+wgt_d9Ld9L[2]+wgt_d9Ld9L[3]
-
-        wgt_d9d8L[7]=wgt_d9d8L[0]+wgt_d9d8L[1]+wgt_d9d8L[2]+wgt_d9d8L[3]+wgt_d9d8L[4]+wgt_d9d8L[5] +wgt_d9d8L[6]        
-        wgt_d8d9L[32]=wgt_d8d9L[0]+wgt_d8d9L[1]+wgt_d8d9L[2]+wgt_d8d9L[3]+wgt_d8d9L[4] 
-        wgt_d9Ld8[7]=wgt_d9Ld8[0]+wgt_d9Ld8[1]+wgt_d9Ld8[2]+wgt_d9Ld8[3]+wgt_d9Ld8[4]+wgt_d9Ld8[5] +wgt_d9Ld8[6]     
-        wgt_d8Ld9[7]=wgt_d8Ld9[0]+wgt_d8Ld9[1]+wgt_d8Ld9[2]+wgt_d8Ld9[3]+wgt_d8Ld9[4]+wgt_d8Ld9[5] +wgt_d8Ld9[6] 
 
 
-        sumweight_picture=wgt_LmLn[0]+wgt_d9Ld10L2[12]+wgt_d9d10L3[2]+wgt_d10L3d9[10]+wgt_d9L2d10L[2]+wgt_d10Ld9L2[2]+wgt_d10d9L3[2]\
-                    +wgt_d10L2d9L[2]+wgt_d8Ld10L[4]+wgt_d10Ld8L[4]+wgt_d8d10L2[4]+wgt_d10d8L2[4]+wgt_d8L2d10[4]\
-                    +wgt_d10L2d8[4]+wgt_d9L2d9[12]+wgt_d9d9L2[4]+wgt_d9Ld9L[39]+wgt_d9d8L[7]+wgt_d8d9L[32]\
-                    +wgt_d9Ld8[7]+wgt_d8Ld9[7]+ wgt_d8d8[14] 
-        sumweight2=wgt_LmLn[0]+wgt_d9Ld10L2[13]+wgt_d9d10L3[8]+wgt_d10L3d9[10]+wgt_d9L2d10L[8]+wgt_d10Ld9L2[8]+wgt_d10d9L3[8]\
-                          +wgt_d10L2d9L[8]+wgt_d8Ld10L[8]+wgt_d10Ld8L[8]+wgt_d8d10L2[8]+wgt_d10d8L2[8]\
-                          +wgt_d8L2d10[8]+ wgt_d10L2d8[8]+wgt_d9L2d9[13]+wgt_d9d9L2[8]+wgt_d9Ld9L[38]\
-                          +wgt_d9d8L[8]+wgt_d8d9L[32]+wgt_d9Ld8[8]+wgt_d8Ld9[8]+ wgt_d8d8[14]
 
-    print ('sumweight=',sumweight/number)
-    #         print ('sumweigh1=',sumweigh1/number)
-    #         print ('OBILAYER=',wgt_OBILAYER[0]) 
-
-    print ('s=',wgt_s[0]/number,'  bonding0=',wgt_s[46]/number,'  bonding1=',wgt_s[47]/number,'  bonding-1=',wgt_s[48]/number) 
-    print ('ddss=',wgt_ddss[0]/number,'  bonding0=',wgt_ddss[46]/number,'  bonding1=',wgt_ddss[47]/number,'  bonding-1=',wgt_ddss[48]/number)  
-    print ('ddsp=',wgt_ddsp[0]/number,'  bonding0=',wgt_ddsp[46]/number,'  bonding1=',wgt_ddsp[47]/number,'  bonding-1=',wgt_ddsp[48]/number) 
-    print ('dssp=',wgt_dssp[0]/number,'  bonding0=',wgt_dssp[46]/number,'  bonding1=',wgt_dssp[47]/number,'  bonding-1=',wgt_dssp[48]/number) 
-    print ('dspp=',wgt_dspp[0]/number,'  bonding0=',wgt_dspp[46]/number,'  bonding1=',wgt_dspp[47]/number,'  bonding-1=',wgt_dspp[48]/number)
-    print ('ddds=',wgt_ddds[0]/number,'  bonding0=',wgt_ddds[46]/number,'  bonding1=',wgt_ddds[47]/number,'  bonding-1=',wgt_ddds[48]/number) 
 
 
     path = './data'		# create file
 
     if os.path.isdir(path) == False:
         os.mkdir(path) 
-
         
     txt=open('./data/a1','a')                                  
     txt.write(str(wgt_a1[0]/number)+'\n')
@@ -1252,861 +1042,912 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
     txt.close()         
     txt=open('./data/O','a')                                  
     txt.write(str(wgt_O[0]/number)+'\n')
-    txt.close()            
-        
-        
+    txt.close()         
+    
+    
+
     txt=open('./data/LmLn','a')                                  
     txt.write(str(wgt_LmLn[0]/number)+'\n')
     txt.close()     
-    txt=open('./data/LmLn_00','a')                                  
-    txt.write(str(wgt_LmLn[1]/number)+'\n')
+    txt=open('./data/LmLn_b0','a')                                  
+    txt.write(str(wgt_LmLn[36]/number)+'\n')
     txt.close()   
-    txt=open('./data/LmLn_10','a')                                  
-    txt.write(str(wgt_LmLn[2]/number)+'\n')
-    txt.close()           
-    txt=open('./data/LmLn_01','a')                                  
-    txt.write(str(wgt_LmLn[3]/number)+'\n')
-    txt.close()           
-    txt=open('./data/LmLn_11','a')                                  
-    txt.write(str(wgt_LmLn[4]/number)+'\n')
-    txt.close()           
-
-    txt=open('./data/d9Ld10L2_dx2y2','a')                                  
-    txt.write(str(wgt_d9Ld10L2[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9Ld10L2_d3z2r2','a')                                  
-    txt.write(str(wgt_d9Ld10L2[1]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d9Ld10L2','a')                                  
-    txt.write(str(wgt_d9Ld10L2[12]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d9Ld10L2_dx2y2_00','a')                                  
-    txt.write(str(wgt_d9Ld10L2[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld10L2_dx2y2_10','a')                                  
-    txt.write(str(wgt_d9Ld10L2[3]/number)+'\n')
-    txt.close()                  
-    txt=open('./data/d9Ld10L2_dx2y2_01','a')                                  
-    txt.write(str(wgt_d9Ld10L2[4]/number)+'\n')
-    txt.close()                  
-    txt=open('./data/d9Ld10L2_dx2y2_11','a')                                  
-    txt.write(str(wgt_d9Ld10L2[5]/number)+'\n')
-    txt.close()                  
-    txt=open('./data/d9Ld10L2_d3z2r2_00','a')                                  
-    txt.write(str(wgt_d9Ld10L2[6]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d9Ld10L2_d3z2r2_10','a')                                  
-    txt.write(str(wgt_d9Ld10L2[7]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d9Ld10L2_d3z2r2_01','a')                                  
-    txt.write(str(wgt_d9Ld10L2[8]/number)+'\n')
-    txt.close()            
-    txt=open('./data/d9Ld10L2_d3z2r2_11','a')                                  
-    txt.write(str(wgt_d9Ld10L2[9]/number)+'\n')
-    txt.close()     
-    txt=open('./data/d9Ld10L2_u','a')                                  
-    txt.write(str(wgt_d9Ld10L2[10]/number)+'\n')
-    txt.close()             
-    txt=open('./data/d9Ld10L2_d','a')                                  
-    txt.write(str(wgt_d9Ld10L2[11]/number)+'\n')
-    txt.close()             
-    txt=open('./data/d9Ld10L2+d10L2d9L','a')                                  
-    txt.write(str(wgt_d9Ld10L2[12]/number+wgt_d10L2d9L[2]/number)+'\n')
-    txt.close() 
-
-
-    txt=open('./data/d9d10L3_dx2y2','a')                                  
-    txt.write(str(wgt_d9d10L3[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9d10L3_d3z2r2','a')                                  
-    txt.write(str(wgt_d9d10L3[1]/number)+'\n')
-    txt.close()
-    txt=open('./data/d9d10L3','a')                                  
-    txt.write(str(wgt_d9d10L3[2]/number)+'\n')
-    txt.close()   
-
-    txt=open('./data/d10L3d9_dx2y2','a')                                  
-    txt.write(str(wgt_d10L3d9[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10L3d9_d3z2r2','a')                                  
-    txt.write(str(wgt_d10L3d9[1]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d10L3d9','a')                                  
-    txt.write(str(wgt_d10L3d9[10]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d10L3d9_dx2y2_u','a')                                  
-    txt.write(str(wgt_d10L3d9[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d10L3d9_dx2y2_d','a')                                  
-    txt.write(str(wgt_d10L3d9[3]/number)+'\n')
-    txt.close()                  
-    txt=open('./data/d10L3d9_d3z2r2_u','a')                                  
-    txt.write(str(wgt_d10L3d9[4]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d10L3d9_d3z2r2_d','a')                                  
-    txt.write(str(wgt_d10L3d9[5]/number)+'\n')
-    txt.close()    
-
-
-
-
-
-    txt=open('./data/d9L2d10L_dx2y2','a')                                  
-    txt.write(str(wgt_d9L2d10L[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9L2d10L_d3z2r2','a')                                  
-    txt.write(str(wgt_d9L2d10L[1]/number)+'\n')
-    txt.close()
-    txt=open('./data/d9L2d10L','a')                                  
-    txt.write(str(wgt_d9L2d10L[2]/number)+'\n')
-    txt.close()        
-
-    txt=open('./data/d10Ld9L2_dx2y2','a')                                  
-    txt.write(str(wgt_d10Ld9L2[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10Ld9L2_d3z2r2','a')                                  
-    txt.write(str(wgt_d10Ld9L2[1]/number)+'\n')
-    txt.close()
-    txt=open('./data/d10Ld9L2','a')                                  
-    txt.write(str(wgt_d10Ld9L2[2]/number)+'\n')
-    txt.close()        
-
-    txt=open('./data/d10d9L3_dx2y2','a')                                  
-    txt.write(str(wgt_d10d9L3[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10d9L3_d3z2r2','a')                                  
-    txt.write(str(wgt_d10d9L3[1]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d10d9L3','a')                                  
-    txt.write(str(wgt_d10d9L3[2]/number)+'\n')
-    txt.close()         
-
-    txt=open('./data/d10L2d9L_dx2y2','a')                                  
-    txt.write(str(wgt_d10L2d9L[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10L2d9L_d3z2r2','a')                                  
-    txt.write(str(wgt_d10L2d9L[1]/number)+'\n')
-    txt.close()   
-    txt=open('./data/d10L2d9L','a')                                  
-    txt.write(str(wgt_d10L2d9L[2]/number)+'\n')
-    txt.close()          
-
-    txt=open('./data/d8Ld10L_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d8Ld10L[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d8Ld10L_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d8Ld10L[1]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d8Ld10L_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8Ld10L[2]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d8Ld10L_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8Ld10L[3]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d8Ld10L','a')                                  
-    txt.write(str(wgt_d8Ld10L[4]/number)+'\n')
-    txt.close()              
-
-    txt=open('./data/d10Ld8L_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d10Ld8L[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10Ld8L_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d10Ld8L[1]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d10Ld8L_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d10Ld8L[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d10Ld8L_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d10Ld8L[3]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d10Ld8L','a')                                  
-    txt.write(str(wgt_d10Ld8L[4]/number)+'\n')
-    txt.close()               
-
-    txt=open('./data/d8d10L2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d10L2[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d8d10L2_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d8d10L2[1]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d8d10L2_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8d10L2[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d10L2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d10L2[3]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d10L2','a')                                  
-    txt.write(str(wgt_d8d10L2[4]/number)+'\n')
-    txt.close()         
-
-    txt=open('./data/d10d8L2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d10d8L2[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10d8L2_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d10d8L2[1]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10d8L2_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d10d8L2[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d10d8L2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d10d8L2[3]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d10d8L2','a')                                  
-    txt.write(str(wgt_d10d8L2[4]/number)+'\n')
-    txt.close()         
-
-    txt=open('./data/d8L2d10_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d8L2d10[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d8L2d10_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d8L2d10[1]/number)+'\n')
-    txt.close()
-    txt=open('./data/d8L2d10_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8L2d10[2]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d8L2d10_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8L2d10[3]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d8L2d10','a')                                  
-    txt.write(str(wgt_d8L2d10[4]/number)+'\n')
-    txt.close()         
-
-    txt=open('./data/d10L2d8_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d10L2d8[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d10L2d8_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d10L2d8[1]/number)+'\n')
-    txt.close()
-    txt=open('./data/d10L2d8_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d10L2d8[2]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d10L2d8_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d10L2d8[3]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d10L2d8','a')                                  
-    txt.write(str(wgt_d10L2d8[4]/number)+'\n')
-    txt.close()         
-
-    txt=open('./data/d9L2d9_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d9L2d9[0]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9L2d9_dx2y2_d3z2r2','a')                                  
-    txt.write(str(wgt_d9L2d9[1]/number)+'\n')
-    txt.close()   
-    txt=open('./data/d9L2d9_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d9L2d9[2]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9L2d9_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d9L2d9[3]/number)+'\n')
-    txt.close()           
-    txt=open('./data/d9L2d9_d3z2r2_dx2y2_su','a')                                  
-    txt.write(str(wgt_d9L2d9[4]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9L2d9_d3z2r2_dx2y2_sd','a')                                  
-    txt.write(str(wgt_d9L2d9[5]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9L2d9_d3z2r2_dx2y2_du','a')                                  
-    txt.write(str(wgt_d9L2d9[6]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9L2d9_d3z2r2_dx2y2_dd','a')                                  
-    txt.write(str(wgt_d9L2d9[7]/number)+'\n')
-    txt.close()                  
-    txt=open('./data/d9L2d9_dx2y2_dx2y2_su','a')                                  
-    txt.write(str(wgt_d9L2d9[8]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9L2d9_dx2y2_dx2y2_sd','a')                                  
-    txt.write(str(wgt_d9L2d9[9]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9L2d9_dx2y2_dx2y2_du','a')                                  
-    txt.write(str(wgt_d9L2d9[10]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9L2d9_dx2y2_dx2y2_dd','a')                                  
-    txt.write(str(wgt_d9L2d9[11]/number)+'\n')
-    txt.close()                  
-    txt=open('./data/d9L2d9','a')                                  
-    txt.write(str(wgt_d9L2d9[12]/number)+'\n')
-    txt.close()         
-
-
-    txt=open('./data/d9d9L2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d9d9L2[0]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d9d9L2_dx2y2_d3z2r2','a')                                  
-    txt.write(str(wgt_d9d9L2[1]/number)+'\n')
+    txt=open('./data/LmLn_b1','a')                                  
+    txt.write(str(wgt_LmLn[37]/number)+'\n')
     txt.close()       
-    txt=open('./data/d9d9L2_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d9d9L2[2]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d9d9L2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d9d9L2[3]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d9d9L2','a')                                  
-    txt.write(str(wgt_d9d9L2[4]/number)+'\n')
-    txt.close()           
-
-    txt=open('./data/d9Ld9L_b1b1','a')                                  
-    txt.write(str(wgt_d9Ld9L[0]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_a1b1','a')                                  
-    txt.write(str(wgt_d9Ld9L[1]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d9Ld9L_b1a1','a')                                  
-    txt.write(str(wgt_d9Ld9L[2]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_a1a1','a')                                  
-    txt.write(str(wgt_d9Ld9L[3]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d9Ld9L_b1b1s00','a')                                  
-    txt.write(str(wgt_d9Ld9L[4]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_b1b1s10','a')                                  
-    txt.write(str(wgt_d9Ld9L[5]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d9Ld9L_b1b1s01','a')                                  
-    txt.write(str(wgt_d9Ld9L[6]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_b1b1s11','a')                                  
-    txt.write(str(wgt_d9Ld9L[7]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_a1b1s00','a')                                  
-    txt.write(str(wgt_d9Ld9L[8]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_a1b1s10','a')                                  
-    txt.write(str(wgt_d9Ld9L[9]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d9Ld9L_a1b1s01','a')                                  
-    txt.write(str(wgt_d9Ld9L[10]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_a1b1s11','a')                                  
-    txt.write(str(wgt_d9Ld9L[11]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d9Ld9L_b1a1s00','a')                                  
-    txt.write(str(wgt_d9Ld9L[12]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_b1a1s10','a')                                  
-    txt.write(str(wgt_d9Ld9L[13]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d9Ld9L_b1a1s01','a')                                  
-    txt.write(str(wgt_d9Ld9L[14]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d9Ld9L_b1a1s11','a')                                  
-    txt.write(str(wgt_d9Ld9L[15]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d9Ld9L_a1a1s00','a')                                  
-    txt.write(str(wgt_d9Ld9L[16]/number)+'\n')
+    txt=open('./data/LmLn_b-1','a')                                  
+    txt.write(str(wgt_LmLn[38]/number)+'\n')
+    txt.close()       
+    
+    txt=open('./data/d8Ld8','a')                                  
+    txt.write(str(wgt_d8Ld8[0]/number)+'\n')
+    txt.close()  
+    txt=open('./data/d8Ld8_b1b1b1b1','a')                                  
+    txt.write(str(wgt_d8Ld8[1]/number)+'\n')
+    txt.close()          
+    txt=open('./data/d8Ld8_a1b1a1b1','a')                                  
+    txt.write(str(wgt_d8Ld8[2]/number)+'\n')
     txt.close()     
-    txt=open('./data/d9Ld9L_a1a1s10','a')                                  
-    txt.write(str(wgt_d9Ld9L[17]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9Ld9L_a1a1s01','a')                                  
-    txt.write(str(wgt_d9Ld9L[18]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld9L_a1a1s11','a')                                  
-    txt.write(str(wgt_d9Ld9L[19]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld9L_bb_s','a')                                  
-    txt.write(str(wgt_d9Ld9L[20]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld9L_bb_d','a')                                  
-    txt.write(str(wgt_d9Ld9L[21]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d9Ld9L_ab_s','a')                                  
-    txt.write(str(wgt_d9Ld9L[22]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld9L_ab_d','a')                                  
-    txt.write(str(wgt_d9Ld9L[23]/number)+'\n')
-    txt.close()           
-    txt=open('./data/d9Ld9L','a')                                  
-    txt.write(str(wgt_d9Ld9L[38]/number)+'\n')
-    txt.close()     
-
-    txt=open('./data/d9d8L_dx2y2_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d9d8L[0]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9d8L_d3z2r2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d9d8L[1]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d9d8L_dx2y2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d9d8L[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9d8L_d3z2r2_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d9d8L[3]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d9d8L_dx2y2_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d9d8L[4]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9d8L_d3z2r2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d9d8L[5]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9d8L_dx2y2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d9d8L[6]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d9d8L','a')                                  
-    txt.write(str(wgt_d9d8L[7]/number)+'\n')
-    txt.close()   
-    txt=open('./data/d9d8L_singlet','a')                                  
-    txt.write(str((wgt_d9d8L[7]/number-wgt_d9d8L[3]/number-wgt_d9d8L[4]/number)/number)+'\n')
-    txt.close()    
-    txt=open('./data/d9d8L_triplet','a')                                  
-    txt.write(str((wgt_d9d8L[3]/number+wgt_d9d8L[4]/number)/number)+'\n')
-    txt.close()            
-
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8d9L[0]/number)+'\n')
-    txt.close()            
-    txt=open('./data/d8d9L_dx2y2_dx2y2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8d9L[1]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d9L[2]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d9L[3]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d8d9L_dx2y2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d9L[4]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_00','a')                                  
-    txt.write(str(wgt_d8d9L[5]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_10','a')                                  
-    txt.write(str(wgt_d8d9L[6]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_01','a')                                  
-    txt.write(str(wgt_d8d9L[7]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_11','a')                                  
-    txt.write(str(wgt_d8d9L[8]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_dx2y2_dx2y2_d3z2r2_00','a')                                  
-    txt.write(str(wgt_d8d9L[9]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_dx2y2_dx2y2_d3z2r2_10','a')                                  
-    txt.write(str(wgt_d8d9L[10]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_dx2y2_dx2y2_d3z2r2_01','a')                                  
-    txt.write(str(wgt_d8d9L[11]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_dx2y2_dx2y2_d3z2r2_11','a')                                  
-    txt.write(str(wgt_d8d9L[12]/number)+'\n')
-    txt.close()            
-    txt=open('./data/d8d9L_d3z2r2_d3z2r2_dx2y2_00','a')                                  
-    txt.write(str(wgt_d8d9L[13]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_d3z2r2_dx2y2_10','a')                                  
-    txt.write(str(wgt_d8d9L[14]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_d3z2r2_d3z2r2_dx2y2_01','a')                                  
-    txt.write(str(wgt_d8d9L[15]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_d3z2r2_d3z2r2_dx2y2_11','a')                                  
-    txt.write(str(wgt_d8d9L[16]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_dx2y2_00','a')                                  
-    txt.write(str(wgt_d8d9L[17]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_dx2y2_10','a')                                  
-    txt.write(str(wgt_d8d9L[18]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_dx2y2_01','a')                                  
-    txt.write(str(wgt_d8d9L[19]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_dx2y2_11','a')                                  
-    txt.write(str(wgt_d8d9L[20]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d8d9L_dx2y2_dx2y2_dx2y2_00','a')                                  
-    txt.write(str(wgt_d8d9L[21]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_dx2y2_dx2y2_dx2y2_10','a')                                  
-    txt.write(str(wgt_d8d9L[22]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_dx2y2_dx2y2_dx2y2_01','a')                                  
-    txt.write(str(wgt_d8d9L[23]/number)+'\n')
-    txt.close()               
-    txt=open('./data/d8d9L_dx2y2_dx2y2_dx2y2_11','a')                                  
-    txt.write(str(wgt_d8d9L[24]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_11ss','a')                                  
-    txt.write(str(wgt_d8d9L[25]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_11sd','a')                                  
-    txt.write(str(wgt_d8d9L[26]/number)+'\n')
-    txt.close()                  
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_11ds','a')                                  
-    txt.write(str(wgt_d8d9L[27]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2_11dd','a')                                  
-    txt.write(str(wgt_d8d9L[28]/number)+'\n')
-    txt.close()                   
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_dx2y2_10s','a')                                  
-    txt.write(str(wgt_d8d9L[29]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_dx2y2_10d','a')                                  
-    txt.write(str(wgt_d8d9L[30]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d8d9L','a')                                  
-    txt.write(str(wgt_d8d9L[31]/number)+'\n')
-    txt.close()    
-    txt=open('./data/d8d9L+d9Ld8','a')                                  
-    txt.write(str(wgt_d8d9L[31]/number+wgt_d9Ld8[8]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d8d9L_dx2y2_dx2y2_dx2y2+d9Ld8','a')                                  
-    txt.write(str(wgt_d8d9L[4]/number+wgt_d9Ld8[6]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d9L_d3z2r2_dx2y2_d3z2r2+d9Ld8','a')                                  
-    txt.write(str(wgt_d8d9L[0]/number+wgt_d9Ld8[1]/number)+'\n')
+    txt=open('./data/d8Ld8_a1b1b1b1','a')                                  
+    txt.write(str(wgt_d8Ld8[3]/number)+'\n')
     txt.close()             
-
-
-    txt=open('./data/d9Ld8_singlet','a')                                  
-    txt.write(str(wgt_d8d9L[5]/number+wgt_d8d9L[7]/number+wgt_d8d9L[9]/number+wgt_d8d9L[11]/number+wgt_d8d9L[13]/number+wgt_d8d9L[15]/number \
-              +wgt_d8d9L[17]/number+wgt_d8d9L[19]/number+wgt_d8d9L[21]/number+wgt_d8d9L[23]/number)+'\n')
-    txt=open('./data/d9Ld8_triplet','a')
-    txt.write(str(wgt_d8d9L[6]/number+wgt_d8d9L[8]/number+wgt_d8d9L[10]/number+wgt_d8d9L[12]/number+wgt_d8d9L[14]/number+wgt_d8d9L[16]/number \
-              +wgt_d8d9L[18]/number+wgt_d8d9L[20]/number+wgt_d8d9L[22]/number+wgt_d8d9L[24]/number)+'\n')
-    txt.close()
-
-
-    txt=open('./data/d9Ld8_dx2y2_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d9Ld8[0]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld8_d3z2r2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d9Ld8[1]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d9Ld8_dx2y2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d9Ld8[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld8_d3z2r2_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d9Ld8[3]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d9Ld8_dx2y2_d3z2r2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d9Ld8[4]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d9Ld8_d3z2r2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d9Ld8[5]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d9Ld8_dx2y2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d9Ld8[6]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d9Ld8','a')                                  
-    txt.write(str(wgt_d9Ld8[8]/number)+'\n')
-    txt.close()         
-    txt=open('./data/d8d9L_singlet','a')                                  
-    txt.write(str((wgt_d9Ld8[7]/number-wgt_d9Ld8[3]/number-wgt_d9Ld8[4]/number))+'\n')
-    txt.close()            
-    txt=open('./data/d8d9L_triplet','a')                                  
-    txt.write(str((wgt_d9Ld8[3]/number+wgt_d9Ld8[4]/number))+'\n')
-    txt.close()          
-
-
-
-    txt=open('./data/d8Ld9_d3z2r2_dx2y2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8Ld9[0]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8Ld9_d3z2r2_dx2y2_d3z2r2_S1','a')                                  
-    txt.write(str(wgt_d8Ld9[1]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d8Ld9_dx2y2_dx2y2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8Ld9[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8Ld9_d3z2r2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d8Ld9[3]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d8Ld9_d3z2r2_dx2y2_dx2y2_S1','a')                                  
-    txt.write(str(wgt_d8Ld9[4]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8Ld9_d3z2r2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8Ld9[5]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d8Ld9_dx2y2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8Ld9[6]/number)+'\n')
-    txt.close() 
-    txt=open('./data/d8Ld9','a')                                  
-    txt.write(str(wgt_d8Ld9[7]/number)+'\n')
-    txt.close()    
-            
-
-
-
-    txt=open('./data/d8d8_dx2y2_dx2y2_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8d8[0]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d8[1]/number)+'\n')
-    txt.close()              
-    txt=open('./data/d8d8_d3z2r2_d3z2r2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d8[2]/number)+'\n')
-    txt.close()          
-    txt=open('./data/d8d8_dx2y2_dx2y2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d8[3]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d8d8_d3z2r2_dx2y2_dx2y2_dx2y2','a')                                  
-    txt.write(str(wgt_d8d8[4]/number)+'\n')
-    txt.close()        
-    txt=open('./data/d8d8_d3z2r2_d3z2r2_d3z2r2_d3z2r2','a')                                  
-    txt.write(str(wgt_d8d8[5]/number)+'\n')
-    txt.close()      
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_00','a')                                  
-    txt.write(str(wgt_d8d8[6]/number)+'\n')
+    txt=open('./data/d8Ld8_b1b1a1b1','a')                                  
+    txt.write(str(wgt_d8Ld8[4]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8Ld8+d8d8L','a')                                  
+    txt.write(str(wgt_d8Ld8[0]/number+wgt_d8d8L[0]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8Ld8_b0','a')                                  
+    txt.write(str(wgt_d8Ld8[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8Ld8_b1','a')                                  
+    txt.write(str(wgt_d8Ld8[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8Ld8_b-1','a')                                  
+    txt.write(str(wgt_d8Ld8[38]/number)+'\n')
     txt.close()           
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_10','a')                                  
-    txt.write(str(wgt_d8d8[7]/number)+'\n')
-    txt.close()                   
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_01','a')                                  
-    txt.write(str(wgt_d8d8[8]/number)+'\n')
-    txt.close()                   
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_11','a')                                  
-    txt.write(str(wgt_d8d8[9]/number)+'\n')
-    txt.close()                   
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_11ss','a')                                  
-    txt.write(str(wgt_d8d8[10]/number)+'\n')
-    txt.close()  
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_11sd','a')                                  
-    txt.write(str(wgt_d8d8[11]/number)+'\n')
+    
+    
+    
+
+    txt=open('./data/d8d8L','a')                                  
+    txt.write(str(wgt_d8d8L[0]/number)+'\n')
     txt.close()          
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_11ds','a')                                  
-    txt.write(str(wgt_d8d8[12]/number)+'\n')
+    txt=open('./data/d8d8L_b1b1b1b1','a')                                  
+    txt.write(str(wgt_d8d8L[1]/number)+'\n')
+    txt.close()          
+    txt=open('./data/d8d8L_a1b1a1b1','a')                                  
+    txt.write(str(wgt_d8d8L[2]/number)+'\n')
+    txt.close()              
+    txt=open('./data/d8d8L_a1b1b1b1','a')                                  
+    txt.write(str(wgt_d8d8L[3]/number)+'\n')
+    txt.close()             
+    txt=open('./data/d8d8L_b1b1a1b1','a')                                  
+    txt.write(str(wgt_d8d8L[4]/number)+'\n')
+    txt.close() 
+    txt=open('./data/d8d8L_b0','a')                                  
+    txt.write(str(wgt_d8d8L[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8d8L_b1','a')                                  
+    txt.write(str(wgt_d8d8L[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8d8L_b-1','a')                                  
+    txt.write(str(wgt_d8d8L[38]/number)+'\n')
+    txt.close()         
+
+
+
+    txt=open('./data/d9Ld8L','a')                                  
+    txt.write(str(wgt_d9Ld8L[0]/number)+'\n')
+    txt.close()         
+    txt=open('./data/d9Ld8L_b1b1b1','a')                                  
+    txt.write(str(wgt_d9Ld8L[1]/number)+'\n')
+    txt.close()        
+    txt=open('./data/d9Ld8L_b1a1b1','a')                                  
+    txt.write(str(wgt_d9Ld8L[2]/number)+'\n')
+    txt.close()     
+    txt=open('./data/d9Ld8L_b1a1b1_0','a')                                  
+    txt.write(str(wgt_d9Ld8L[3]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d9Ld8L_b1a1b1_1','a')                                  
+    txt.write(str(wgt_d9Ld8L[4]/number)+'\n')
+    txt.close()        
+    txt=open('./data/d9Ld8L_a1a1b1','a')                                  
+    txt.write(str(wgt_d9Ld8L[5]/number)+'\n')
+    txt.close() 
+    txt=open('./data/d9Ld8L+d8Ld9L','a')                                  
+    txt.write(str(wgt_d9Ld8L[0]/number+wgt_d8Ld9L[0]/number)+'\n')
+    txt.close()      
+    txt=open('./data/d9Ld8L_b1a1b1_d8Ld9L','a')                                  
+    txt.write(str(wgt_d9Ld8L[2]*2/number)+'\n')
+    txt.close()     
+    txt=open('./data/d9Ld8L_b0','a')                                  
+    txt.write(str(wgt_d9Ld8L[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9Ld8L_b1','a')                                  
+    txt.write(str(wgt_d9Ld8L[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9Ld8L_b-1','a')                                  
+    txt.write(str(wgt_d9Ld8L[38]/number)+'\n')
+    txt.close()     
+    
+    
+    
+    
+
+    txt=open('./data/d8Ld9L','a')                                  
+    txt.write(str(wgt_d8Ld9L[0]/number)+'\n')
+    txt.close()         
+    txt=open('./data/d8Ld9L_b1b1b1','a')                                  
+    txt.write(str(wgt_d8Ld9L[1]/number)+'\n')
+    txt.close()        
+    txt=open('./data/d8Ld9L_a1b1b1','a')                                  
+    txt.write(str(wgt_d8Ld9L[2]/number)+'\n')
+    txt.close()     
+    txt=open('./data/d8Ld9L_a1b1b1_0','a')                                  
+    txt.write(str(wgt_d8Ld9L[3]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d8Ld9L_a1b1b1_1','a')                                  
+    txt.write(str(wgt_d8Ld9L[4]/number)+'\n')
+    txt.close()           
+    txt=open('./data/d8Ld9L_a1b1a1','a')                                  
+    txt.write(str(wgt_d8Ld9L[5]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d8Ld9L_b0','a')                                  
+    txt.write(str(wgt_d8Ld9L[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8Ld9L_b1','a')                                  
+    txt.write(str(wgt_d8Ld9L[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8Ld9L_b-1','a')                                  
+    txt.write(str(wgt_d8Ld9L[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    
+    txt=open('./data/d9L2d8','a')                                  
+    txt.write(str(wgt_d9L2d8[0]/number)+'\n')
     txt.close()  
-    txt=open('./data/d8d8_d3z2r2_dx2y2_d3z2r2_dx2y2_11dd','a')                                  
-    txt.write(str(wgt_d8d8[13]/number)+'\n')
-    txt.close()                  
-
-
-    txt=open('./data/d8d8','a')                                  
-    txt.write(str(wgt_d8d8[14]/number)+'\n')
+    txt=open('./data/d9L2d8_b1b1b1','a')                                  
+    txt.write(str(wgt_d9L2d8[1]/number)+'\n')
+    txt.close()           
+    txt=open('./data/d9L2d8_a1a1b1','a')                                  
+    txt.write(str(wgt_d9L2d8[2]/number)+'\n')
+    txt.close()    
+    txt=open('./data/d9L2d8_b1a1b1','a')                                  
+    txt.write(str(wgt_d9L2d8[3]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d9L2d8+d8d9L2','a')                                  
+    txt.write(str(wgt_d9L2d8[0]/number+wgt_d8d9L2[0]/number)+'\n')
+    txt.close()      
+    txt=open('./data/d9L2d8_b0','a')                                  
+    txt.write(str(wgt_d9L2d8[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9L2d8_b1','a')                                  
+    txt.write(str(wgt_d9L2d8[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L2d8_b-1','a')                                  
+    txt.write(str(wgt_d9L2d8[38]/number)+'\n')
     txt.close()     
 
 
+
+
+    txt=open('./data/d8d9L2','a')                                  
+    txt.write(str(wgt_d8d9L2[0]/number)+'\n')
+    txt.close()         
+    txt=open('./data/d8d9L2_b1b1b1','a')                                  
+    txt.write(str(wgt_d8d9L2[1]/number)+'\n')
+    txt.close()           
+    txt=open('./data/d8d9L2_a1b1a1','a')                                  
+    txt.write(str(wgt_d8d9L2[2]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d8d9L2_a1b1b1','a')                                  
+    txt.write(str(wgt_d8d9L2[3]/number)+'\n')
+    txt.close()             
+    txt=open('./data/d8d9L2_b0','a')                                  
+    txt.write(str(wgt_d8d9L2[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8d9L2_b1','a')                                  
+    txt.write(str(wgt_d8d9L2[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8d9L2_b-1','a')                                  
+    txt.write(str(wgt_d8d9L2[38]/number)+'\n')
+    txt.close()     
+
+
+
+
+    txt=open('./data/d9d8L2','a')                                  
+    txt.write(str(wgt_d9d8L2[0]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d9d8L2_b0','a')                                  
+    txt.write(str(wgt_d9d8L2[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9d8L2_b1','a')                                  
+    txt.write(str(wgt_d9d8L2[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9d8L2_b-1','a')                                  
+    txt.write(str(wgt_d9d8L2[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    
+    txt=open('./data/d9d9L3','a')                                  
+    txt.write(str(wgt_d9d9L3[0]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d9d9L3_b0','a')                                  
+    txt.write(str(wgt_d9d9L3[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9d9L3_b1','a')                                  
+    txt.write(str(wgt_d9d9L3[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9d9L3_b-1','a')                                  
+    txt.write(str(wgt_d9d9L3[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    
+    txt=open('./data/d9Ld9L2','a')                                  
+    txt.write(str(wgt_d9Ld9L2[0]/number)+'\n')
+    txt.close()  
+    txt=open('./data/d9Ld9L2_b1b1','a')                                  
+    txt.write(str(wgt_d9Ld9L2[1]/number)+'\n')
+    txt.close()          
+    txt=open('./data/d9Ld9L2_a1b1','a')                                  
+    txt.write(str(wgt_d9Ld9L2[2]/number)+'\n')
+    txt.close()              
+    txt=open('./data/d9Ld9L2_b1a1','a')                                  
+    txt.write(str(wgt_d9Ld9L2[3]/number)+'\n')
+    txt.close()              
+    txt=open('./data/d9Ld9L2_a1a1','a')                                  
+    txt.write(str(wgt_d9Ld9L2[4]/number)+'\n')
+    txt.close()  
+    txt=open('./data/d9Ld9L2+d9L2d9L','a')                                  
+    txt.write(str(wgt_d9Ld9L2[0]/number+wgt_d9L2d9L[0]/number)+'\n')
+    txt.close()  
+    txt=open('./data/d9Ld9L2_b1b1_d9L2d9L','a')                                  
+    txt.write(str(wgt_d9Ld9L2[1]*2/number)+'\n')
+    txt.close()     
+    txt=open('./data/d9Ld9L2_b1a1_d9L2d9L','a')                                  
+    txt.write(str(wgt_d9Ld9L2[3]*2/number)+'\n')
+    txt.close()         
+    txt=open('./data/d9Ld9L2_b0','a')                                  
+    txt.write(str(wgt_d9Ld9L2[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9Ld9L2_b1','a')                                  
+    txt.write(str(wgt_d9Ld9L2[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9Ld9L2_b-1','a')                                  
+    txt.write(str(wgt_d9Ld9L2[38]/number)+'\n')
+    txt.close()     
+    
+    
+    
+    
+    
+    
+
+    txt=open('./data/d9L2d9L','a')                                  
+    txt.write(str(wgt_d9L2d9L[0]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L2d9L_b1b1','a')                                  
+    txt.write(str(wgt_d9L2d9L[1]/number)+'\n')
+    txt.close()          
+    txt=open('./data/d9L2d9L_a1b1','a')                                  
+    txt.write(str(wgt_d9L2d9L[2]/number)+'\n')
+    txt.close()              
+    txt=open('./data/d9L2d9L_b1a1','a')                                  
+    txt.write(str(wgt_d9L2d9L[3]/number)+'\n')
+    txt.close()              
+    txt=open('./data/d9L2d9L_a1a1','a')                                  
+    txt.write(str(wgt_d9L2d9L[4]/number)+'\n')
+    txt.close()              
+    txt=open('./data/d9L2d9L_b0','a')                                  
+    txt.write(str(wgt_d9L2d9L[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9L2d9L_b1','a')                                  
+    txt.write(str(wgt_d9L2d9L[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L2d9L_b-1','a')                                  
+    txt.write(str(wgt_d9L2d9L[38]/number)+'\n')
+    txt.close()     
+
+
+
+
+    txt=open('./data/d9L3d9','a')                                  
+    txt.write(str(wgt_d9L3d9[0]/number)+'\n')
+    txt.close()         
+    txt=open('./data/d9L3d9_b0','a')                                  
+    txt.write(str(wgt_d9L3d9[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9L3d9_b1','a')                                  
+    txt.write(str(wgt_d9L3d9[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L3d9_b-1','a')                                  
+    txt.write(str(wgt_d9L3d9[38]/number)+'\n')
+    txt.close()     
+    
+    
+    
+    
+    
+
+    txt=open('./data/d8d10L3','a')                                  
+    txt.write(str(wgt_d8d10L3[0]/number)+'\n')
+    txt.close()         
+    txt=open('./data/d8d10L3_b0','a')                                  
+    txt.write(str(wgt_d8d10L3[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8d10L3_b1','a')                                  
+    txt.write(str(wgt_d8d10L3[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8d10L3_b-1','a')                                  
+    txt.write(str(wgt_d8d10L3[38]/number)+'\n')
+    txt.close()     
+    
+    
+    
+    
+    
+
+    txt=open('./data/d8Ld10L2','a')                                  
+    txt.write(str(wgt_d8Ld10L2[0]/number)+'\n')
+    txt.close() 
+    txt=open('./data/d8Ld10L2+d10L2d8L','a')                                  
+    txt.write(str(wgt_d8Ld10L2[0]/number*2)+'\n')
+    txt.close()     
+    txt=open('./data/d8Ld10L2_b0','a')                                  
+    txt.write(str(wgt_d8Ld10L2[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8Ld10L2_b1','a')                                  
+    txt.write(str(wgt_d8Ld10L2[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8Ld10L2_b-1','a')                                  
+    txt.write(str(wgt_d8Ld10L2[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    
+    txt=open('./data/d8L2d10L','a')                                  
+    txt.write(str(wgt_d8L2d10L[0]/number)+'\n')
+    txt.close()    
+    txt=open('./data/d8L2d10L_b0','a')                                  
+    txt.write(str(wgt_d8L2d10L[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8L2d10L_b1','a')                                  
+    txt.write(str(wgt_d8L2d10L[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8L2d10L_b-1','a')                                  
+    txt.write(str(wgt_d8L2d10L[38]/number)+'\n')
+    txt.close()     
+    
+    
+    
+    
+
+    txt=open('./data/d8L3d10','a')                                  
+    txt.write(str(wgt_d8L3d10[0]/number)+'\n')
+    txt.close()                 
+    txt=open('./data/d8L3d10_b0','a')                                  
+    txt.write(str(wgt_d8L3d10[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d8L3d10_b1','a')                                  
+    txt.write(str(wgt_d8L3d10[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d8L3d10_b-1','a')                                  
+    txt.write(str(wgt_d8L3d10[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    
+    txt=open('./data/d9d10L4','a')                                  
+    txt.write(str(wgt_d9d10L4[0]/number)+'\n')
+    txt.close()           
+    txt=open('./data/d9d10L4_b0','a')                                  
+    txt.write(str(wgt_d9d10L4[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9d10L4_b1','a')                                  
+    txt.write(str(wgt_d9d10L4[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9d10L4_b-1','a')                                  
+    txt.write(str(wgt_d9d10L4[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    
+    
+    txt=open('./data/d9Ld10L3','a')                                  
+    txt.write(str(wgt_d9Ld10L3[0]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9Ld10L3_b0','a')                                  
+    txt.write(str(wgt_d9Ld10L3[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9Ld10L3_b1','a')                                  
+    txt.write(str(wgt_d9Ld10L3[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9Ld10L3_b-1','a')                                  
+    txt.write(str(wgt_d9Ld10L3[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    txt=open('./data/d9L2d10L2','a')                                  
+    txt.write(str(wgt_d9L2d10L2[0]/number)+'\n')
+    txt.close()    
+    txt=open('./data/d9L2d10L2+d10L2d9L2','a')                                  
+    txt.write(str(wgt_d9L2d10L2[0]/number*2)+'\n')
+    txt.close()        
+    txt=open('./data/d9L2d10L2_b0','a')                                  
+    txt.write(str(wgt_d9L2d10L2[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9L2d10L2_b1','a')                                  
+    txt.write(str(wgt_d9L2d10L2[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L2d10L2_b-1','a')                                  
+    txt.write(str(wgt_d9L2d10L2[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
+    
+    txt=open('./data/d9L3d10L','a')                                  
+    txt.write(str(wgt_d9L3d10L[0]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L3d10L_b0','a')                                  
+    txt.write(str(wgt_d9L3d10L[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9L3d10L_b1','a')                                  
+    txt.write(str(wgt_d9L3d10L[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L3d10L_b-1','a')                                  
+    txt.write(str(wgt_d9L3d10L[38]/number)+'\n')
+    txt.close()     
+    
+    
+    
+    
+
+    txt=open('./data/d9L4d10','a')                                  
+    txt.write(str(wgt_d9L4d10[0]/number)+'\n')
+    txt.close()               
+    txt=open('./data/d9L4d10_b0','a')                                  
+    txt.write(str(wgt_d9L4d10[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/d9L4d10_b1','a')                                  
+    txt.write(str(wgt_d9L4d10[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/d9L4d10_b-1','a')                                  
+    txt.write(str(wgt_d9L4d10[38]/number)+'\n')
+    txt.close()     
+
+    
+    
+    
     txt=open('./data/s','a')                                  
     txt.write(str(wgt_s[0]/number)+'\n')
+    txt.close()           
+    txt=open('./data/s_b0','a')                                  
+    txt.write(str(wgt_s[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/s_b1','a')                                  
+    txt.write(str(wgt_s[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/s_b-1','a')                                  
+    txt.write(str(wgt_s[38]/number)+'\n')
     txt.close()     
+    
+    
+    
+    
 
-    txt=open('./data/ddss','a')                                  
-    txt.write(str(wgt_ddss[0]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddss_11','a')                                  
-    txt.write(str(wgt_ddss[1]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddss_00','a')                                  
-    txt.write(str(wgt_ddss[2]/number)+'\n')
-    txt.close()      
-    txt=open('./data/ddss_10','a')                                  
-    txt.write(str(wgt_ddss[3]/number)+'\n')
-    txt.close()      
-    txt=open('./data/ddss_11_a1a1','a')                                  
-    txt.write(str(wgt_ddss[4]/number)+'\n')
+    txt=open('./data/ds','a')                                  
+    txt.write(str(wgt_ds[0]/number)+'\n')
     txt.close()     
-    txt=open('./data/ddss_11_a1b1','a')                                  
-    txt.write(str(wgt_ddss[5]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddss_11_b1b1','a')                                  
-    txt.write(str(wgt_ddss[6]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddss_00_a1a1','a')                                  
-    txt.write(str(wgt_ddss[7]/number)+'\n')
-    txt.close()     
-    txt=open('./data/ddss_00_a1b1','a')                                  
-    txt.write(str(wgt_ddss[8]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddss_00_b1b1','a')                                  
-    txt.write(str(wgt_ddss[9]/number)+'\n')
-    txt.close()               
-    txt=open('./data/ddss_10_a1a1','a')                                  
-    txt.write(str(wgt_ddss[10]/number)+'\n')
-    txt.close()     
-    txt=open('./data/ddss_10_a1b1','a')                                  
-    txt.write(str(wgt_ddss[11]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddss_10_b1b1','a')                                  
-    txt.write(str(wgt_ddss[12]/number)+'\n')
+    txt=open('./data/dssoo','a')                                  
+    txt.write(str(wgt_ds[1]/number)+'\n')
+    txt.close()         
+    txt=open('./data/dsooo','a')                                  
+    txt.write(str(wgt_ds[2]/number)+'\n')
     txt.close()    
-
-
-    txt=open('./data/ddsp','a')                                  
-    txt.write(str(wgt_ddsp[0]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddsp_11','a')                                  
-    txt.write(str(wgt_ddsp[1]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddsp_00','a')                                  
-    txt.write(str(wgt_ddsp[2]/number)+'\n')
+    txt=open('./data/dssoo_2_22','a')                                  
+    txt.write(str(wgt_ds[3]/number)+'\n')
+    txt.close()     
+    txt=open('./data/dssoo_2_20','a')                                  
+    txt.write(str(wgt_ds[4]/number)+'\n')
     txt.close()      
-    txt=open('./data/ddsp_10','a')                                  
-    txt.write(str(wgt_ddsp[3]/number)+'\n')
+    txt=open('./data/dssoo_2_00','a')                                  
+    txt.write(str(wgt_ds[5]/number)+'\n')
     txt.close()      
-    txt=open('./data/ddsp_11_a1a1','a')                                  
-    txt.write(str(wgt_ddsp[4]/number)+'\n')
+    txt=open('./data/dsooo_2_220','a')                                  
+    txt.write(str(wgt_ds[6]/number)+'\n')
     txt.close()     
-    txt=open('./data/ddsp_11_a1b1','a')                                  
-    txt.write(str(wgt_ddsp[5]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddsp_11_b1b1','a')                                  
-    txt.write(str(wgt_ddsp[6]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddsp_00_a1a1','a')                                  
-    txt.write(str(wgt_ddsp[7]/number)+'\n')
+    txt=open('./data/dsooo_2_200','a')                                  
+    txt.write(str(wgt_ds[7]/number)+'\n')
+    txt.close()      
+    txt=open('./data/dsooo_2_000','a')                                  
+    txt.write(str(wgt_ds[8]/number)+'\n')
+    txt.close()      
+    txt=open('./data/dssoo_2_22_b1','a')                                  
+    txt.write(str(wgt_ds[9]/number)+'\n')
     txt.close()     
-    txt=open('./data/ddsp_00_a1b1','a')                                  
-    txt.write(str(wgt_ddsp[8]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddsp_00_b1b1','a')                                  
-    txt.write(str(wgt_ddsp[9]/number)+'\n')
-    txt.close()               
-    txt=open('./data/ddsp_10_a1a1','a')                                  
-    txt.write(str(wgt_ddsp[10]/number)+'\n')
+    txt=open('./data/dssoo_2_20_b1','a')                                  
+    txt.write(str(wgt_ds[10]/number)+'\n')
+    txt.close()      
+    txt=open('./data/dssoo_2_00_b1','a')                                  
+    txt.write(str(wgt_ds[11]/number)+'\n')
+    txt.close()      
+    txt=open('./data/dsooo_2_220_b1','a')                                  
+    txt.write(str(wgt_ds[12]/number)+'\n')
     txt.close()     
-    txt=open('./data/ddsp_10_a1b1','a')                                  
-    txt.write(str(wgt_ddsp[11]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddsp_10_b1b1','a')                                  
-    txt.write(str(wgt_ddsp[12]/number)+'\n')
-    txt.close()    
-    txt=open('./data/ddsp_10_a1b1_z2','a')                                  
-    txt.write(str(wgt_ddsp[13]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddsp_10_a1b1_z0','a')                                  
-    txt.write(str(wgt_ddsp[14]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddsp_10_a1b1_z2_1','a')                                  
-    txt.write(str(wgt_ddsp[15]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddsp_10_a1b1_z2_0','a')                                  
-    txt.write(str(wgt_ddsp[16]/number)+'\n')
+    txt=open('./data/dsooo_2_200_b1','a')                                  
+    txt.write(str(wgt_ds[13]/number)+'\n')
+    txt.close()      
+    txt=open('./data/dsooo_2_000_b1','a')                                  
+    txt.write(str(wgt_ds[14]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ds_b0','a')                                  
+    txt.write(str(wgt_ds[36]/number)+'\n')
+    txt.close()   
+    txt=open('./data/ds_b1','a')                                  
+    txt.write(str(wgt_ds[37]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ds_b-1','a')                                  
+    txt.write(str(wgt_ds[38]/number)+'\n')
     txt.close()     
-    txt=open('./data/ddsp_10_1','a')                                  
-    txt.write(str(wgt_ddsp[17]/number)+'\n')
-    txt.close()             
-    txt=open('./data/ddsp_10_0','a')                                  
-    txt.write(str(wgt_ddsp[18]/number)+'\n')
-    txt.close()            
+    
 
-    txt=open('./data/dssp','a')                                  
-    txt.write(str(wgt_dssp[0]/number)+'\n')
-    txt.close()     
-    txt=open('./data/dssp_22','a')                                  
-    txt.write(str(wgt_dssp[1]/number)+'\n')
-    txt.close()        
-    txt=open('./data/dssp_20','a')                                  
-    txt.write(str(wgt_dssp[2]/number)+'\n')
-    txt.close()     
-    txt=open('./data/dssp_22_a1','a')                                  
-    txt.write(str(wgt_dssp[3]/number)+'\n')
-    txt.close()               
-    txt=open('./data/dssp_22_b1','a')                                  
-    txt.write(str(wgt_dssp[4]/number)+'\n')
-    txt.close()                   
-    txt=open('./data/dssp_20_a1','a')                                  
-    txt.write(str(wgt_dssp[5]/number)+'\n')
-    txt.close()               
-    txt=open('./data/dssp_20_b1','a')                                  
-    txt.write(str(wgt_dssp[6]/number)+'\n')
+    
+    
+    
+    txt=open('./data/dds','a')                                  
+    txt.write(str(wgt_dds[0]/number)+'\n')
+    txt.close()  
+    txt=open('./data/ddsso','a')                                  
+    txt.write(str(wgt_dds[1]/number)+'\n')
     txt.close()          
-
-    txt=open('./data/dspp','a')                                  
-    txt.write(str(wgt_dspp[0]/number)+'\n')
-    txt.close()     
-    txt=open('./data/dspp_10','a')                                  
-    txt.write(str(wgt_dspp[1]/number)+'\n')
-    txt.close()        
-    txt=open('./data/dspp_00','a')                                  
-    txt.write(str(wgt_dspp[2]/number)+'\n')
-    txt.close()     
-    txt=open('./data/dspp_1_a1','a')                                  
-    txt.write(str(wgt_dspp[3]/number)+'\n')
+    txt=open('./data/ddsoo','a')                                  
+    txt.write(str(wgt_dds[2]/number)+'\n')
+    txt.close() 
+    txt=open('./data/ddsso_22','a')                                  
+    txt.write(str(wgt_dds[3]/number)+'\n')
+    txt.close()          
+    txt=open('./data/ddsso_20','a')                                  
+    txt.write(str(wgt_dds[4]/number)+'\n')
+    txt.close()             
+    txt=open('./data/ddsso_00','a')                                  
+    txt.write(str(wgt_dds[5]/number)+'\n')
+    txt.close()             
+    txt=open('./data/ddsoo_22','a')                                  
+    txt.write(str(wgt_dds[6]/number)+'\n')
+    txt.close()          
+    txt=open('./data/ddsoo_20','a')                                  
+    txt.write(str(wgt_dds[7]/number)+'\n')
+    txt.close()             
+    txt=open('./data/ddsoo_00','a')                                  
+    txt.write(str(wgt_dds[8]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_22_22_b1b1','a')                                  
+    txt.write(str(wgt_dds[9]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsso_22_22_a1b1','a')                                  
+    txt.write(str(wgt_dds[10]/number)+'\n')
     txt.close()               
-    txt=open('./data/dspp_1_b1','a')                                  
-    txt.write(str(wgt_dspp[4]/number)+'\n')
-    txt.close()                   
-    txt=open('./data/dspp_0_a1','a')                                  
-    txt.write(str(wgt_dspp[5]/number)+'\n')
+    txt=open('./data/ddsso_22_22_b1a1','a')                                  
+    txt.write(str(wgt_dds[11]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_22_22_a1a1','a')                                  
+    txt.write(str(wgt_dds[12]/number)+'\n')
     txt.close()               
-    txt=open('./data/dspp_0_b1','a')                                  
-    txt.write(str(wgt_dspp[6]/number)+'\n')
+    txt=open('./data/ddsso_20_22_b1b1','a')                                  
+    txt.write(str(wgt_dds[13]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsso_20_22_a1b1','a')                                  
+    txt.write(str(wgt_dds[14]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_20_22_b1a1','a')                                  
+    txt.write(str(wgt_dds[15]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_20_22_a1a1','a')                                  
+    txt.write(str(wgt_dds[16]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_00_22_b1b1','a')                                  
+    txt.write(str(wgt_dds[17]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsso_00_22_a1b1','a')                                  
+    txt.write(str(wgt_dds[18]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_00_22_b1a1','a')                                  
+    txt.write(str(wgt_dds[19]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_00_22_a1a1','a')                                  
+    txt.write(str(wgt_dds[20]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_22_22_b1b1','a')                                  
+    txt.write(str(wgt_dds[21]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsoo_22_22_a1b1','a')                                  
+    txt.write(str(wgt_dds[22]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_22_22_b1a1','a')                                  
+    txt.write(str(wgt_dds[23]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsoo_22_22_a1a1','a')                                  
+    txt.write(str(wgt_dds[24]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_20_22_b1b1','a')                                  
+    txt.write(str(wgt_dds[25]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsoo_20_22_a1b1','a')                                  
+    txt.write(str(wgt_dds[26]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_20_22_b1a1','a')                                  
+    txt.write(str(wgt_dds[27]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsoo_20_22_a1a1','a')                                  
+    txt.write(str(wgt_dds[28]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_00_22_b1b1','a')                                  
+    txt.write(str(wgt_dds[29]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsoo_00_22_a1b1','a')                                  
+    txt.write(str(wgt_dds[30]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_00_22_b1a1','a')                                  
+    txt.write(str(wgt_dds[31]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsoo_00_22_a1a1','a')                                  
+    txt.write(str(wgt_dds[32]/number)+'\n')
+    txt.close()            
+    txt=open('./data/ddsso_22_20_b1b1','a')                                  
+    txt.write(str(wgt_dds[33]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsso_22_20_a1b1','a')                                  
+    txt.write(str(wgt_dds[34]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_22_20_b1a1','a')                                  
+    txt.write(str(wgt_dds[35]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_22_20_a1a1','a')                                  
+    txt.write(str(wgt_dds[36]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_20_20_b1b1','a')                                  
+    txt.write(str(wgt_dds[37]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsso_20_20_a1b1','a')                                  
+    txt.write(str(wgt_dds[38]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_20_20_b1a1','a')                                  
+    txt.write(str(wgt_dds[39]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_20_20_a1a1','a')                                  
+    txt.write(str(wgt_dds[40]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_00_20_b1b1','a')                                  
+    txt.write(str(wgt_dds[41]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsso_00_20_a1b1','a')                                  
+    txt.write(str(wgt_dds[42]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsso_00_20_b1a1','a')                                  
+    txt.write(str(wgt_dds[43]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_00_20_a1a1','a')                                  
+    txt.write(str(wgt_dds[44]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_22_20_b1b1','a')                                  
+    txt.write(str(wgt_dds[45]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsoo_22_20_a1b1','a')                                  
+    txt.write(str(wgt_dds[46]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_22_20_b1a1','a')                                  
+    txt.write(str(wgt_dds[47]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsoo_22_20_a1a1','a')                                  
+    txt.write(str(wgt_dds[48]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_20_20_b1b1','a')                                  
+    txt.write(str(wgt_dds[49]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsoo_20_20_a1b1','a')                                  
+    txt.write(str(wgt_dds[50]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_20_20_b1a1','a')                                  
+    txt.write(str(wgt_dds[51]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsoo_20_20_a1a1','a')                                  
+    txt.write(str(wgt_dds[52]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_00_20_b1b1','a')                                  
+    txt.write(str(wgt_dds[53]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsoo_00_20_a1b1','a')                                  
+    txt.write(str(wgt_dds[54]/number)+'\n')
+    txt.close()               
+    txt=open('./data/ddsoo_00_20_b1a1','a')                                  
+    txt.write(str(wgt_dds[55]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsoo_00_20_a1a1','a')                                  
+    txt.write(str(wgt_dds[56]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_22_22','a')                                  
+    txt.write(str(wgt_dds[57]/number)+'\n')
+    txt.close()          
+    txt=open('./data/ddsso_22_20','a')                                  
+    txt.write(str(wgt_dds[58]/number)+'\n')
+    txt.close()          
+    txt=open('./data/ddsso_20_22','a')                                  
+    txt.write(str(wgt_dds[59]/number)+'\n')
+    txt.close() 
+    txt=open('./data/ddsso_20_20','a')                                  
+    txt.write(str(wgt_dds[60]/number)+'\n')
     txt.close()     
-
+    txt=open('./data/ddsso_00_22','a')                                  
+    txt.write(str(wgt_dds[61]/number)+'\n')
+    txt.close() 
+    txt=open('./data/ddsso_00_20','a')                                  
+    txt.write(str(wgt_dds[62]/number)+'\n')
+    txt.close()     
+    txt=open('./data/ddsoo_22_22','a')                                  
+    txt.write(str(wgt_dds[63]/number)+'\n')
+    txt.close() 
+    txt=open('./data/ddsoo_22_20','a')                                  
+    txt.write(str(wgt_dds[64]/number)+'\n')
+    txt.close()      
+    txt=open('./data/ddsoo_20_22','a')                                  
+    txt.write(str(wgt_dds[65]/number)+'\n')
+    txt.close()  
+    txt=open('./data/ddsoo_20_20','a')                                  
+    txt.write(str(wgt_dds[66]/number)+'\n')
+    txt.close()      
+    txt=open('./data/ddsoo_00_22','a')                                  
+    txt.write(str(wgt_dds[67]/number)+'\n')
+    txt.close()  
+    txt=open('./data/ddsoo_00_20','a')                                  
+    txt.write(str(wgt_dds[68]/number)+'\n')
+    txt.close()  
+    txt=open('./data/ddsso_b0','a')                                  
+    txt.write(str(wgt_dds[73]/number)+'\n')
+    txt.close()   
+    txt=open('./data/ddsso_b1','a')                                  
+    txt.write(str(wgt_dds[74]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsso_b-1','a')                                  
+    txt.write(str(wgt_dds[75]/number)+'\n')
+    txt.close()         
+    txt=open('./data/ddsoo_b0','a')                                  
+    txt.write(str(wgt_dds[76]/number)+'\n')
+    txt.close()   
+    txt=open('./data/ddsoo_b1','a')                                  
+    txt.write(str(wgt_dds[77]/number)+'\n')
+    txt.close()       
+    txt=open('./data/ddsoo_b-1','a')                                  
+    txt.write(str(wgt_dds[78]/number)+'\n')
+    txt.close()     
+    
+    
+    
+    
     txt=open('./data/ddds','a')                                  
     txt.write(str(wgt_ddds[0]/number)+'\n')
-    txt.close()            
-    txt=open('./data/ddds_110','a')                                  
+    txt.close()           
+    txt=open('./data/dddss','a')                                  
     txt.write(str(wgt_ddds[1]/number)+'\n')
-    txt.close()             
-    txt=open('./data/ddds_100','a')                                  
+    txt.close()         
+    txt=open('./data/dddso','a')                                  
     txt.write(str(wgt_ddds[2]/number)+'\n')
-    txt.close()              
-    txt=open('./data/ddds_110_a1a1a1','a')                                  
+    txt.close()               
+    txt=open('./data/dddss_220','a')                                  
     txt.write(str(wgt_ddds[3]/number)+'\n')
-    txt.close()             
-    txt=open('./data/ddds_110_a1b1a1','a')                                  
+    txt.close()   
+    txt=open('./data/dddss_200','a')                                  
     txt.write(str(wgt_ddds[4]/number)+'\n')
-    txt.close()                
-    txt=open('./data/ddds_110_b1b1a1','a')                                  
+    txt.close()           
+    txt=open('./data/dddso_220','a')                                  
     txt.write(str(wgt_ddds[5]/number)+'\n')
-    txt.close()                     
-    txt=open('./data/ddds_110_a1a1b1','a')                                  
+    txt.close()   
+    txt=open('./data/dddso_200','a')                                  
     txt.write(str(wgt_ddds[6]/number)+'\n')
     txt.close()             
-    txt=open('./data/ddds_110_a1b1b1','a')                                  
+    txt=open('./data/dddss_220_b1b1b1','a')                                  
     txt.write(str(wgt_ddds[7]/number)+'\n')
-    txt.close()                
-    txt=open('./data/ddds_110_b1b1b1','a')                                  
+    txt.close()        
+    txt=open('./data/dddss_220_a1b1b1','a')                                  
     txt.write(str(wgt_ddds[8]/number)+'\n')
-    txt.close()          
-    txt=open('./data/ddds_100_a1a1a1','a')                                  
+    txt.close()                
+    txt=open('./data/dddss_220_a1b1a1','a')                                  
     txt.write(str(wgt_ddds[9]/number)+'\n')
-    txt.close()             
-    txt=open('./data/ddds_100_a1a1b1','a')                                  
+    txt.close()       
+    txt=open('./data/dddss_200_b1b1b1','a')                                  
     txt.write(str(wgt_ddds[10]/number)+'\n')
     txt.close()        
-    txt=open('./data/ddds_100_a1b1b1','a')                                  
+    txt=open('./data/dddss_200_b1a1b1','a')                                  
     txt.write(str(wgt_ddds[11]/number)+'\n')
     txt.close()                
-    txt=open('./data/ddds_100_b1a1a1','a')                                  
+    txt=open('./data/dddss_200_a1a1b1','a')                                  
     txt.write(str(wgt_ddds[12]/number)+'\n')
-    txt.close()             
-    txt=open('./data/ddds_100_b1a1b1','a')                                  
+    txt.close()              
+    txt=open('./data/dddso_220_b1b1b1','a')                                  
     txt.write(str(wgt_ddds[13]/number)+'\n')
     txt.close()        
-    txt=open('./data/ddds_100_b1b1b1','a')                                  
+    txt=open('./data/dddso_220_a1b1b1','a')                                  
     txt.write(str(wgt_ddds[14]/number)+'\n')
-    txt.close()                   
-    txt=open('./data/ddds_110_a1b1b1_1','a')                                  
+    txt.close()                
+    txt=open('./data/dddso_220_a1b1a1','a')                                  
     txt.write(str(wgt_ddds[15]/number)+'\n')
-    txt.close()        
-    txt=open('./data/ddds_110_a1b1b1_0','a')                                  
+    txt.close()       
+    txt=open('./data/dddso_200_b1b1b1','a')                                  
     txt.write(str(wgt_ddds[16]/number)+'\n')
     txt.close()        
+    txt=open('./data/dddso_200_b1a1b1','a')                                  
+    txt.write(str(wgt_ddds[17]/number)+'\n')
+    txt.close()                
+    txt=open('./data/dddso_200_a1a1b1','a')                                  
+    txt.write(str(wgt_ddds[18]/number)+'\n')
+    txt.close()          
+    txt=open('./data/dddso_200_2','a')                                  
+    txt.write(str(wgt_ddds[19]/number)+'\n')
+    txt.close() 
+    txt=open('./data/dddso_200_0','a')                                  
+    txt.write(str(wgt_ddds[20]/number)+'\n')
+    txt.close()     
+    txt=open('./data/dddss_b0','a')                                  
+    txt.write(str(wgt_ddds[73]/number)+'\n')
+    txt.close()   
+    txt=open('./data/dddss_b1','a')                                  
+    txt.write(str(wgt_ddds[74]/number)+'\n')
+    txt.close()       
+    txt=open('./data/dddss_b-1','a')                                  
+    txt.write(str(wgt_ddds[75]/number)+'\n')
+    txt.close()         
+    txt=open('./data/dddso_b0','a')                                  
+    txt.write(str(wgt_ddds[76]/number)+'\n')
+    txt.close()   
+    txt=open('./data/dddso_b1','a')                                  
+    txt.write(str(wgt_ddds[77]/number)+'\n')
+    txt.close()       
+    txt=open('./data/dddso_b-1','a')                                  
+    txt.write(str(wgt_ddds[78]/number)+'\n')
+    txt.close()      
 
+    
+    
+    
+    txt=open('./data/dddds','a')                                  
+    txt.write(str(wgt_dddds[0]/number)+'\n')
+    txt.close()   
+    txt=open('./data/dddds_b1b1b1b1','a')                                  
+    txt.write(str(wgt_dddds[1]/number)+'\n')
+    txt.close()      
+    txt=open('./data/dddds_a1b1a1b1','a')                                  
+    txt.write(str(wgt_dddds[2]/number)+'\n')
+    txt.close()        
+    txt=open('./data/dddds_a1b1b1b1','a')                                  
+    txt.write(str(wgt_dddds[3]/number)+'\n')
+    txt.close()    
+    txt=open('./data/dddds_b1b1a1b1','a')                                  
+    txt.write(str(wgt_dddds[4]/number)+'\n')
+    txt.close()        
+    txt=open('./data/dddds_a1a1a1a1','a')                                  
+    txt.write(str(wgt_dddds[5]/number)+'\n')
+    txt.close()        
+    txt=open('./data/dddds_b0','a')                                  
+    txt.write(str(wgt_dddds[76]/number)+'\n')
+    txt.close()   
+    txt=open('./data/dddds_b1','a')                                  
+    txt.write(str(wgt_dddds[77]/number)+'\n')
+    txt.close()       
+    txt=open('./data/dddds_b-1','a')                                  
+    txt.write(str(wgt_dddds[78]/number)+'\n')
+    txt.close()          
+    
+    
 
     txt=open('./data/number','a')                                  
     txt.write(str(number)+'\n')
     txt.close() 
+        
+        
 
-    print ('sumweight2=',sumweight2)        
-    print ('sumweight_picture=',sumweight_picture)
-    print ('LmLn=',wgt_LmLn[0]/number,'  bonding0=',wgt_LmLn[46]/number,'  bonding1=',wgt_LmLn[47]/number,'  bonding-1=',wgt_LmLn[48]/number)
-    print ('d9Ld10L2=',wgt_d9Ld10L2[12]/number+wgt_d10L2d9L[2]/number,'  bonding0=',wgt_d9Ld10L2[46]/number+wgt_d10L2d9L[46]/number,'  bonding1=',wgt_d9Ld10L2[47]/number+wgt_d10L2d9L[47]/number,'  bonding-1=',wgt_d9Ld10L2[48]/number+wgt_d10L2d9L[48]/number)
-    print ('d9d10L3=',wgt_d9d10L3[2]/number+wgt_d10L3d9[10]/number,'  bonding0=',wgt_d9d10L3[46]/number+wgt_d10L3d9[46]/number,'  bonding1=',wgt_d9d10L3[47]/number+wgt_d10L3d9[47]/number,'  bonding-1=',wgt_d9d10L3[48]/number+wgt_d10L3d9[48]/number)        
-            
-    print ('d9L2d10L=',wgt_d9L2d10L[2]/number+wgt_d10Ld9L2[2]/number,'  bonding0=',wgt_d9L2d10L[46]/number+wgt_d10Ld9L2[46]/number,'  bonding1=',wgt_d9L2d10L[47]/number+wgt_d10Ld9L2[47]/number,'  bonding-1=',wgt_d9L2d10L[48]/number+wgt_d10Ld9L2[48]/number)
-     
-#     print ('d10d9L3=',wgt_d10d9L3[2]/number)
 
-    print ('d8Ld10L=',wgt_d8Ld10L[4]/number+wgt_d10Ld8L[4]/number,'  bonding0=',wgt_d8Ld10L[46]/number+wgt_d10Ld8L[46]/number,'  bonding1=',wgt_d8Ld10L[47]/number+wgt_d10Ld8L[47]/number,'  bonding-1=',wgt_d8Ld10L[48]/number+wgt_d10Ld8L[48]/number)
-    
-    print ('d8d10L2=',wgt_d8d10L2[4]/number+wgt_d10L2d8[4]/number,'  bonding0=',wgt_d8d10L2[46]/number+wgt_d10L2d8[46]/number,'  bonding1=',wgt_d8d10L2[47]/number+wgt_d10L2d8[47]/number,'  bonding-1=',wgt_d8d10L2[48]/number+wgt_d10L2d8[48]/number)
-    print ('d10d8L2=',wgt_d10d8L2[4]/number+wgt_d8L2d10[4]/number,'  bonding0=',wgt_d10d8L2[46]/number+wgt_d8L2d10[46]/number,'  bonding1=',wgt_d10d8L2[47]/number+wgt_d8L2d10[47]/number,'  bonding-1=',wgt_d10d8L2[48]/number+wgt_d8L2d10[48]/number) 
 
-    print ('d9L2d9=',wgt_d9L2d9[12]/number+wgt_d9d9L2[4]/number,'  bonding0=',wgt_d9L2d9[46]/number+wgt_d9d9L2[46]/number,'  bonding1=',wgt_d9L2d9[47]/number+wgt_d9d9L2[47]/number,'  bonding-1=',wgt_d9L2d9[48]/number+wgt_d9d9L2[48]/number)
-      
-    print ('d9Ld9L=',wgt_d9Ld9L[39]/number,'  bonding0=',wgt_d9Ld9L[46]/number,'  bonding1=',wgt_d9Ld9L[47]/number,'  bonding-1=',wgt_d9Ld9L[48]/number)        
-    print ('d9d8L=',wgt_d9d8L[7]/number+wgt_d8Ld9[7]/number,'  bonding0=',wgt_d9d8L[46]/number+wgt_d8Ld9[46]/number,'  bonding1=',wgt_d9d8L[47]/number+wgt_d8Ld9[47]/number,'  bonding-1=',wgt_d9d8L[48]/number+wgt_d8Ld9[48]/number)        
-    print ('d8d9L=',wgt_d8d9L[31]/number+wgt_d9Ld8[8]/number,'  bonding0=',wgt_d8d9L[46]/number+wgt_d9Ld8[46]/number,'  bonding1=',wgt_d8d9L[47]/number+wgt_d9Ld8[47]/number,'  bonding-1=',wgt_d8d9L[48]/number+wgt_d9Ld8[48]/number)
-       
-    print ('d8d8=',wgt_d8d8[14]/number,'  bonding0=',wgt_d8d8[46]/number,'  bonding1=',wgt_d8d8[47]/number,'  bonding-1=',wgt_d8d8[48]/number)
 
-    print ('text0=',text[0]/number)
-    print ('text1=',text[1]/number)
-    print ('text-1=',text[2]/number)    
     print("--- get_ground_state %s seconds ---" % (time.time() - t1))
                 
     return vals, vecs 
