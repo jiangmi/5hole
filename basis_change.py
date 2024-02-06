@@ -541,8 +541,8 @@ def create_bonding_anti_bonding_basis_change_matrix(VS):
         elif ((slabel[1] == 'd3z2r2' and slabel[4]==2) or (slabel[6] == 'd3z2r2' and slabel[9]==2) or \
             (slabel[11] == 'd3z2r2' and slabel[14]==2) or (slabel[16] == 'd3z2r2' and slabel[19]==2) or \
             (slabel[21] == 'd3z2r2' and slabel[24]==2)) and ((slabel[1] == 'd3z2r2' and slabel[4]==0) or \
-            (slabel[6] == 'd3z2r2' and slabel[9]==2) or (slabel[11] == 'd3z2r2' and slabel[14]==2) or \
-            (slabel[16] == 'd3z2r2' and slabel[19]==2) or (slabel[21] == 'd3z2r2' and slabel[24]==2)) and \
+            (slabel[6] == 'd3z2r2' and slabel[9]==0) or (slabel[11] == 'd3z2r2' and slabel[14]==0) or \
+            (slabel[16] == 'd3z2r2' and slabel[19]==0) or (slabel[21] == 'd3z2r2' and slabel[24]==0)) and \
             (slabel[4]==1 or slabel[9]==1 or slabel[14]==1 or slabel[19]==1 or slabel[24]==1):
             if i not in count_list:
                 # append matrix elements for bonding
