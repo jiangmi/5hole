@@ -26,8 +26,8 @@ start_time = time.time()
 M_PI = math.pi
                   
 #####################################
-def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tpzd,tpzp,tz_a1a1,tz_b1b1,pds,pdp,pps,ppp,Upp,\
-                    d_Ni_double,d_Cu_double,p_double,pz_double,double_Ni_part,hole345_Ni_part, double_Cu_part,\
+def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tpzd,tpzp,tz_a1a1,tz_b1b1,pds,pdp,pps,ppp,Upp,Uss,\
+                    d_Ni_double,d_Cu_double,p_double,apz_double,double_Ni_part,hole345_Ni_part, double_Cu_part,\
                     hole345_Cu_part, idx_Ni,idx_Cu, U_Ni, \
                     S_Ni_val, Sz_Ni_val, AorB_Ni_sym, \
                     U_Cu, S_Cu_val, Sz_Cu_val, AorB_Cu_sym):  
@@ -84,10 +84,10 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tpzd,tpzp,tz_a1a1,tz_b1b
     
 
     if Norb==5 or Norb==6 or Norb==10 or Norb==11 or Norb==12:     
-        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,p_double,double_Ni_part, idx_Ni, hole345_Ni_part,  \
-                                                      S_Ni_val, Sz_Ni_val,AorB_Ni_sym, ACu, ANi, Upp)
-        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,p_double,double_Cu_part, idx_Cu, hole345_Cu_part, \
-                                                      S_Cu_val, Sz_Cu_val,AorB_Cu_sym, ACu, ANi, Upp)        
+        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,p_double,apz_double,double_Ni_part, idx_Ni, hole345_Ni_part,  \
+                                                      S_Ni_val, Sz_Ni_val,AorB_Ni_sym, ACu, ANi, Upp, Uss)
+        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,p_double,apz_double,double_Cu_part, idx_Cu, hole345_Cu_part, \
+                                                      S_Cu_val, Sz_Cu_val,AorB_Cu_sym, ACu, ANi, Upp, Uss)        
         
         if pam.if_H0_rotate_byU==1:
             H_Ni = H0_Ni_new + Hint_Ni
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     
     d_Ni_double, idx_Ni, hole345_Ni_part,  double_Ni_part, \
     d_Cu_double, idx_Cu, hole345_Cu_part,  double_Cu_part, \
-    p_double,pz_double = ham.get_double_occu_list(VS)
+    p_double,apz_double = ham.get_double_occu_list(VS)
     
     # change the basis for d_double states to be singlet/triplet
     
@@ -226,16 +226,16 @@ if __name__ == '__main__':
                 #                            util.get_atomic_d8_energy(ANi,B,C)
                                             for tpp in pam.tpps:
                                                 for Upp in pam.Upps:
-                                                    print ('===================================================')
-                                                    print ('ANi=',ANi, 'ACu=',ACu,'epCu=', epCu, 'epNi=',epNi,\
-                                                           ' tpd=',tpd,' tpp=',tpp,' Upp=',Upp ,'tz_a1a1=',tz_a1a1,'tz_b1b1=',tz_b1b1,\
-                                                           'tapzd=',tapzd,'tapzp=',tapzp)
+                                                    for Uss in pam.Usss:
+                                                        print ('===================================================')
+                                                        print ('ANi=',ANi, 'ACu=',ACu,'epCu=', epCu, 'epNi=',epNi,\
+                                                               ' tpd=',tpd,' tpp=',tpp,' Upp=',Upp,' Uss=',Uss ,'tz_a1a1=',tz_a1a1,'tz_b1b1=',tz_b1b1,\
+                                                               'tapzd=',tapzd,'tapzp=',tapzp)
 
-                                                    compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tapzd,tapzp,tz_a1a1,tz_b1b1,0,0,0,0,Upp,\
-                                                                    d_Ni_double,d_Cu_double,p_double,pz_double,double_Ni_part,hole345_Ni_part,\
-                                                                    double_Cu_part,hole345_Cu_part, idx_Ni,idx_Cu, \
-                                                                    U_Ni, S_Ni_val, Sz_Ni_val, AorB_Ni_sym ,U_Cu, \
-                                                                    S_Cu_val, Sz_Cu_val, AorB_Cu_sym)  
+                                                        compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tapzd,tapzp,tz_a1a1,tz_b1b1,0,0,0,0,Upp,Uss,\
+                                                                        d_Ni_double,d_Cu_double,p_double,apz_double,double_Ni_part,hole345_Ni_part,\
+                                                                        double_Cu_part,hole345_Cu_part, idx_Ni,idx_Cu, \
+                                                                        U_Ni, S_Ni_val, Sz_Ni_val, AorB_Ni_sym ,U_Cu, \
+                                                                        S_Cu_val, Sz_Cu_val, AorB_Cu_sym)  
 
                         
-    print("--- %s seconds ---" % (time.time() - start_time))

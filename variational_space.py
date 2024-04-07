@@ -489,8 +489,11 @@ class VariationalSpace:
                                                         # assume two holes from undoped d9d9 is up-dn
                                                         if pam.reduce_VS==1:
                                                             sss = sorted([s1,s2,s3,s4,s5])
-                                                            if sss!=['dn','up','up','up','up']:
+                                                            if sss!=['dn','dn','up','up','up'] and \
+                                                              sss!=['dn','dn','dn','up','up']:
                                                                 continue
+
+
 
                                                         # neglect d7 state !!
                                                         if not exist_d6_d7_state\

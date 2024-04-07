@@ -1555,7 +1555,7 @@ def get_double_occu_list(VS):
             elif z2==0:            
                 util.get_double_append(i,145,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s1,o1,x1,y1,z1,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)
-            elif z1==2:
+            elif z2==1:
                 apz_list.append(i)                  
                 
         if (x2, y2, z2)==(x4, y4, z4):
@@ -1565,7 +1565,7 @@ def get_double_occu_list(VS):
             elif z2==0:
                 util.get_double_append(i,135,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s5,o5,x5,y5,z5,\
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part) 
-            elif z1==2:
+            elif z2==1:
                 apz_list.append(i)                
                 
         if (x3, y3, z3)==(x4, y4, z4):
@@ -1625,14 +1625,14 @@ def get_double_occu_list(VS):
     print ("len(apz_list)", len(apz_list))    
     print ("len(idx_Ni)", len(idx_Ni))
     print ("len(idx_Cu)", len(idx_Cu))
-
+    print (apz_list)
     
     return d_Ni_list, idx_Ni, hole345_Ni_part,  double_Ni_part, \
            d_Cu_list, idx_Cu, hole345_Cu_part, double_Cu_part, \
            p_list,apz_list
 
-def create_interaction_matrix_ALL_syms(VS,d_double,p_double,double_part,idx,hole345_part , \
-                                       S_val, Sz_val, AorB_sym,ACu, ANi, Upp):
+def create_interaction_matrix_ALL_syms(VS,d_double,p_double,apz_double,double_part,idx,hole345_part , \
+                                       S_val, Sz_val, AorB_sym,ACu, ANi, Upp, Uss):
     '''
     Create Coulomb-exchange interaction matrix of d-multiplets including all symmetries
     
@@ -1800,6 +1800,10 @@ def create_interaction_matrix_ALL_syms(VS,d_double,p_double,double_part,idx,hole
     if Upp!=0:
         for i in p_double:
             data.append(Upp); row.append(i); col.append(i)
+    if Uss!=0:
+        for i in apz_double:
+            data.append(Uss); row.append(i); col.append(i)            
+            
 
     row = np.array(row)
     col = np.array(col)
