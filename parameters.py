@@ -61,14 +61,14 @@ if Norb==8 or Norb==5:
 #     tpds = [0.01]
 
     # 29.5GPa:
-    tpds = np.linspace(1.2,1.2, num=1, endpoint=True) #[0.25]
+    tpds = np.linspace(0.3,0.3, num=1, endpoint=True) #[0.25]
 
     tpps = [0.55]
 
     # 29.5GPa:
     tpps = [0.35]
     
-    tapzds = np.linspace(2.4,2.7, num=2, endpoint=True)
+    tapzds = np.linspace(0,4.2, num=1, endpoint=True)
     tapzps = np.linspace(0, 0, num=1, endpoint=True)
     tz_a1a1 = 0.028
 
@@ -168,7 +168,7 @@ orbs = Ni_Cu_orbs + O_orbs + Obilayer_orbs
 #assert(len(orbs)==Norb)
 
 Upps = [0]
-Usss = [0]
+Usss = [4]
 symmetries = ['1A1','3B1','3B1','1A2','3A2','1E','3E']
 print ("compute A(w) for symmetries = ",symmetries)
 

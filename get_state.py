@@ -17,15 +17,15 @@ import ground_state as gs
 
 
 ############################################################################
-def get_d9Ld9L_state_indices(VS):
+def get_d8Od8_state_indices(VS):
     '''
-    Get d9Ld9L state index
+    Get d8Od8 state index
     o1=='d3z2r2' and o2=='dx2y2'
     '''    
     Norb = pam.Norb
     dim = VS.dim
-    a1L_b1L_state_indices = []; a1L_b1L_state_labels = []
-    b1L_a1L_state_indices = []; b1L_a1L_state_labels = []
+    a1b1_O_a1b1_state_indices = []; a1b1_O_a1b1_state_labels = []
+
     
     for i in range(0,dim):
         # state is original state but its orbital info remains after basis change
@@ -34,43 +34,105 @@ def get_d9Ld9L_state_indices(VS):
         s1 = state['hole1_spin']
         s2 = state['hole2_spin']
         s3 = state['hole3_spin']
-        s4 = state['hole4_spin']        
-        o1 = state['hole1_orb']
-        o2 = state['hole2_orb']
-        o3 = state['hole3_orb']
-        o4 = state['hole4_orb']        
+        s4 = state['hole4_spin'] 
+        s5 = state['hole5_spin']             
+        orb1 = state['hole1_orb']
+        orb2 = state['hole2_orb']
+        orb3 = state['hole3_orb']
+        orb4 = state['hole4_orb'] 
+        orb5 = state['hole5_orb']             
         x1, y1, z1 = state['hole1_coord']
         x2, y2, z2 = state['hole2_coord']
         x3, y3, z3 = state['hole3_coord']
-        x4, y4, z4 = state['hole4_coord']
-        slabel=[s1,o1,x1,y1,z1,s2,o2,x2,y2,z2,s3,o3,x3,y3,z3,s4,o4,x4,y4,z4]
-        slabel= gs.make_z_canonical(slabel)
-        s1 = slabel[0]; o1 = slabel[1]; x1 = slabel[2]; y1 = slabel[3]; z1 = slabel[4];
-        s2 = slabel[5]; o2 = slabel[6]; x2 = slabel[7]; y2 = slabel[8]; z2 = slabel[9];
-        s3 = slabel[10]; o3 = slabel[11]; x3 = slabel[12]; y3 = slabel[13]; z3 = slabel[14];
-        s4 = slabel[15]; o4 = slabel[16]; x4 = slabel[17]; y4 = slabel[18]; z4 = slabel[19];            
+        x4, y4, z4 = state['hole4_coord']  
+        x5, y5, z5 = state['hole5_coord']              
+        slabel=[s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+        slabel= make_z_canonical(slabel)
+        s1 = slabel[0]; orb1 = slabel[1]; x1 = slabel[2]; y1 = slabel[3]; z1 = slabel[4];
+        s2 = slabel[5]; orb2 = slabel[6]; x2 = slabel[7]; y2 = slabel[8]; z2 = slabel[9];
+        s3 = slabel[10]; orb3 = slabel[11]; x3 = slabel[12]; y3 = slabel[13]; z3 = slabel[14];
+        s4 = slabel[15]; orb4 = slabel[16]; x4 = slabel[17]; y4 = slabel[18]; z4 = slabel[19];     
+        s5 = slabel[20]; orb5 = slabel[21]; x5 = slabel[22]; y5 = slabel[23]; z5 = slabel[24];               
 
  
-        if not ((o1 in pam.Ni_Cu_orbs) and (o2 in pam.Ni_Cu_orbs) and (o3 in pam.O_orbs) and (o4 in pam.O_orbs) \
-                and z1==z3==1 and z2==z4==0):
+        if not ((o1 in pam.Ni_Cu_orbs) and (o2 in pam.Ni_Cu_orbs) and (o3 in pam.Ni_Cu_orbs) and (o4 in pam.Ni_Cu_orbs) \
+                and (o5 in pam.Obilayer_orbs) and z1==z2==2 and z3==z4==0):
             continue 
             
-        if not (((x3==1 or x3==-1) or (y3==1 or y3==-1)) and ((x4==1 or x4==-1) or (y4==1 or y4==-1))):
-            continue        
-            
-        orbs = [o1,o2,o3]
-        xs = [x1,x2,x3]
-        ys = [y1,y2,y3]
-        zs = [z1,z2,z3] 
-            
+
+
 
         # d9_{a1b1} singlet:
-        if  o1=='dx2y2' and o2=='dx2y2' and o3=='px' and o4=='px':
-            a1L_b1L_state_indices.append(i); a1L_b1L_state_labels.append('$b1L-b1L$')
-            print ("a1L_b1L_state_indices", i, ", state: orb= ",s1,o1,x1, y1, z1,s2,o2,x2, y2, z2,s3,o3,x3, y3, z3,s4,o4,x4, y4, z4)
+        if  o1=='d3z2r2' and o2=='dx2y2' and o3=='d3z2r2' and o4=='dx2y2':
+            a1b1_O_a1b1_state_indices.append(i); a1b1_O_a1b1_state_labels.append('$a1b1_O_a1b1$')
+            print ("a1b1_O_a1b1_state_indices", i, ", state: orb= ",s1,o1,x1, y1, z1,s2,o2,x2, y2, z2,s3,o3,x3, y3, z3,s4,o4,x4, y4, z4,s5,o5,x5, y5, z5)
     
 
-    return a1L_b1L_state_indices, a1L_b1L_state_labels
+    return a1b1_O_a1b1_state_indices, a1b1_O_a1b1_state_labels
+
+
+
+
+
+
+def get_d8d8L_state_indices(VS):
+    '''
+    Get d8d8L state index
+    o1=='d3z2r2' and o2=='dx2y2'
+    '''    
+    Norb = pam.Norb
+    dim = VS.dim
+    a1b1_a1b1L_state_indices = []; a1b1_a1b1L_state_labels = []
+
+    
+    for i in range(0,dim):
+        # state is original state but its orbital info remains after basis change
+        state = VS.get_state(VS.lookup_tbl[i])
+            
+        s1 = state['hole1_spin']
+        s2 = state['hole2_spin']
+        s3 = state['hole3_spin']
+        s4 = state['hole4_spin'] 
+        s5 = state['hole5_spin']             
+        orb1 = state['hole1_orb']
+        orb2 = state['hole2_orb']
+        orb3 = state['hole3_orb']
+        orb4 = state['hole4_orb'] 
+        orb5 = state['hole5_orb']             
+        x1, y1, z1 = state['hole1_coord']
+        x2, y2, z2 = state['hole2_coord']
+        x3, y3, z3 = state['hole3_coord']
+        x4, y4, z4 = state['hole4_coord']  
+        x5, y5, z5 = state['hole5_coord']              
+        slabel=[s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
+        slabel= make_z_canonical(slabel)
+        s1 = slabel[0]; orb1 = slabel[1]; x1 = slabel[2]; y1 = slabel[3]; z1 = slabel[4];
+        s2 = slabel[5]; orb2 = slabel[6]; x2 = slabel[7]; y2 = slabel[8]; z2 = slabel[9];
+        s3 = slabel[10]; orb3 = slabel[11]; x3 = slabel[12]; y3 = slabel[13]; z3 = slabel[14];
+        s4 = slabel[15]; orb4 = slabel[16]; x4 = slabel[17]; y4 = slabel[18]; z4 = slabel[19];     
+        s5 = slabel[20]; orb5 = slabel[21]; x5 = slabel[22]; y5 = slabel[23]; z5 = slabel[24];               
+
+ 
+        if not ((o1 in pam.Ni_Cu_orbs) and (o2 in pam.Ni_Cu_orbs) and (o3 in pam.Ni_Cu_orbs) and (o4 in pam.Ni_Cu_orbs) \
+                and (o5 in pam.O_orbs) and z1==z2==2 and z3==z4==z5==0):
+            continue 
+            
+        if not ((x5==1 or x5==-1) and (y5==1 or y5==-1)):
+            continue   
+
+
+        # d9_{a1b1} singlet:
+        if  o1=='d3z2r2' and o2=='dx2y2' and o3=='d3z2r2' and o4=='dx2y2' :
+            a1b1_O_a1b1_state_indices.append(i); a1b1_O_a1b1_state_labels.append('$a1b1_a1b1L$')
+            print ("a1b1_a1b1L_state_indices", i, ", state: orb= ",s1,o1,x1, y1, z1,s2,o2,x2, y2, z2,s3,o3,x3, y3, z3,s4,o4,x4, y4, z4,s5,o5,x5, y5, z5)
+    
+
+    return a1b1_a1b1L_state_indices, a1b1_a1b1L_state_labels
+
+
+
+
+
 
 def get_d9d9L2_state_indices(VS):
     '''

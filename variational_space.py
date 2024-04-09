@@ -352,6 +352,21 @@ def exist_d6_d7_state(o1,o2,o3,o4,o5,z1,z2,z3,z4,z5):
     else:
         return True
     
+    
+def exist_d6_state(o1,o2,o3,o4,o5,z1,z2,z3,z4,z5):
+
+    if (o1 in pam.Ni_Cu_orbs  and o2 in pam.Ni_Cu_orbs  and o3 in pam.Ni_Cu_orbs and o4 in pam.Ni_Cu_orbs  and z1==z2==z3==z4) or \
+            (o1 in pam.Ni_Cu_orbs  and o2 in pam.Ni_Cu_orbs  and o3 in pam.Ni_Cu_orbs and o5 in pam.Ni_Cu_orbs  and z1==z2==z3==z5) or \
+            (o1 in pam.Ni_Cu_orbs  and o2 in pam.Ni_Cu_orbs  and o4 in pam.Ni_Cu_orbs and o5 in pam.Ni_Cu_orbs  and z1==z2==z4==z5) or \
+            (o1 in pam.Ni_Cu_orbs  and o3 in pam.Ni_Cu_orbs  and o4 in pam.Ni_Cu_orbs and o5 in pam.Ni_Cu_orbs  and z1==z3==z4==z5) or \
+            (o2 in pam.Ni_Cu_orbs  and o3 in pam.Ni_Cu_orbs  and o4 in pam.Ni_Cu_orbs and o5 in pam.Ni_Cu_orbs  and z2==z3==z4==z5):
+
+        return False        
+    
+    else:
+        return True    
+    
+    
 class VariationalSpace:
     '''
     Distance (L1-norm) between any two particles must not exceed a

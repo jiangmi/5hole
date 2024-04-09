@@ -194,7 +194,7 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
     
     
     #get state components in GS and another 9 higher states; note that indices is a tuple
-    for k in range(0,20):                                                                          #gai
+    for k in range(0,number):                                                                          #gai
         #if vals[k]<pam.w_start or vals[k]>pam.w_stop:
         #if vals[k]<11.5 or vals[k]>14.5:
         #if k<Neval:

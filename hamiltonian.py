@@ -1527,7 +1527,7 @@ def get_double_occu_list(VS):
                                    d_Cu_list,p_list,idx_Cu,hole345_Cu_part, double_Cu_part)
             elif z1==1:
                 apz_list.append(i)                  
-            
+                
         if (x1, y1, z1)==(x3, y3, z3):
             if z1==2:
                 util.get_double_append(i,245,s1,o1,x1,y1,z1,s3,o3,x3,y3,z3,s2,o2,x2,y2,z2,s4,o4,x4,y4,z4,s5,o5,x5,y5,z5,\
@@ -1625,14 +1625,14 @@ def get_double_occu_list(VS):
     print ("len(apz_list)", len(apz_list))    
     print ("len(idx_Ni)", len(idx_Ni))
     print ("len(idx_Cu)", len(idx_Cu))
-    print (apz_list)
+#     print (apz_list)
     
     return d_Ni_list, idx_Ni, hole345_Ni_part,  double_Ni_part, \
            d_Cu_list, idx_Cu, hole345_Cu_part, double_Cu_part, \
            p_list,apz_list
 
-def create_interaction_matrix_ALL_syms(VS,d_double,p_double,apz_double,double_part,idx,hole345_part , \
-                                       S_val, Sz_val, AorB_sym,ACu, ANi, Upp, Uss):
+def create_interaction_matrix_ALL_syms(VS,d_double,double_part,idx,hole345_part , \
+                                       S_val, Sz_val, AorB_sym,ACu, ANi):
     '''
     Create Coulomb-exchange interaction matrix of d-multiplets including all symmetries
     
@@ -1796,7 +1796,49 @@ def create_interaction_matrix_ALL_syms(VS,d_double,p_double,apz_double,double_pa
                                 
                           
 
-    # Create Upp matrix for p-orbital multiplets
+       
+            
+
+    row = np.array(row)
+    col = np.array(col)
+    data = np.array(data)
+    
+    #print(data)
+    
+    # check if hoppings occur within groups of (up,up), (dn,dn), and (up,dn) 
+    #assert(check_spin_group(row,col,data,VS)==True)
+    out = sps.coo_matrix((data,(row,col)),shape=(dim,dim))
+
+    print("--- create_interaction_matrix_ALL_syms %s seconds ---" % (time.time() - t1))
+    
+    return out
+
+
+def create_interaction_matrix_po(VS,p_double,apz_double, Upp, Uss):
+    '''
+    Create Coulomb-exchange interaction matrix of d-multiplets including all symmetries
+    
+    Loop over all d_double states, find the corresponding sym channel; 
+    the other loop over all d_double states, if it has same sym channel and S, Sz
+    enter into the matrix element
+    
+    There are some complications or constraints due to three holes and one Nd electron:
+    From H_matrix_reducing_VS file, to set up interaction between states i and j:
+    1. i and j belong to the same type, same order of orbitals to label the state (idxi==idxj below)
+    2. i and j's spins are same; or L and s should also have same spin
+    3. Positions of L and Nd-electron should also be the same
+    '''    
+    t1 = time.time()
+    print ("start create_interaction_matrix")
+    
+    Norb = pam.Norb
+    dim = VS.dim
+    data = []
+    row = []
+    col = []
+    dd_state_indices = []
+    
+
     if Upp!=0:
         for i in p_double:
             data.append(Upp); row.append(i); col.append(i)
