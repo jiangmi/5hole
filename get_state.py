@@ -47,7 +47,7 @@ def get_d8Od8_state_indices(VS):
         x4, y4, z4 = state['hole4_coord']  
         x5, y5, z5 = state['hole5_coord']              
         slabel=[s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
-        slabel= make_z_canonical(slabel)
+        slabel= gs.make_z_canonical(slabel)
         s1 = slabel[0]; orb1 = slabel[1]; x1 = slabel[2]; y1 = slabel[3]; z1 = slabel[4];
         s2 = slabel[5]; orb2 = slabel[6]; x2 = slabel[7]; y2 = slabel[8]; z2 = slabel[9];
         s3 = slabel[10]; orb3 = slabel[11]; x3 = slabel[12]; y3 = slabel[13]; z3 = slabel[14];
@@ -55,17 +55,17 @@ def get_d8Od8_state_indices(VS):
         s5 = slabel[20]; orb5 = slabel[21]; x5 = slabel[22]; y5 = slabel[23]; z5 = slabel[24];               
 
  
-        if not ((o1 in pam.Ni_Cu_orbs) and (o2 in pam.Ni_Cu_orbs) and (o3 in pam.Ni_Cu_orbs) and (o4 in pam.Ni_Cu_orbs) \
-                and (o5 in pam.Obilayer_orbs) and z1==z2==2 and z3==z4==0):
+        if not ((orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) \
+                and (orb5 in pam.Obilayer_orbs) and z1==z2==2 and z3==z4==0):
             continue 
             
 
 
 
         # d9_{a1b1} singlet:
-        if  o1=='d3z2r2' and o2=='dx2y2' and o3=='d3z2r2' and o4=='dx2y2':
+        if  orb1=='d3z2r2' and orb2=='dx2y2' and orb3=='d3z2r2' and orb4=='dx2y2' and (s1=='up' and s2=='up' and s3=='up' and s4=='dn' and s5=='dn'):
             a1b1_O_a1b1_state_indices.append(i); a1b1_O_a1b1_state_labels.append('$a1b1_O_a1b1$')
-            print ("a1b1_O_a1b1_state_indices", i, ", state: orb= ",s1,o1,x1, y1, z1,s2,o2,x2, y2, z2,s3,o3,x3, y3, z3,s4,o4,x4, y4, z4,s5,o5,x5, y5, z5)
+            print ("a1b1_O_a1b1_state_indices", i, ", state: ",s1,orb1,x1, y1, z1,s2,orb2,x2, y2, z2,s3,orb3,x3, y3, z3,s4,orb4,x4, y4, z4,s5,orb5,x5, y5, z5)
     
 
     return a1b1_O_a1b1_state_indices, a1b1_O_a1b1_state_labels
@@ -105,7 +105,7 @@ def get_d8d8L_state_indices(VS):
         x4, y4, z4 = state['hole4_coord']  
         x5, y5, z5 = state['hole5_coord']              
         slabel=[s1,orb1,x1,y1,z1,s2,orb2,x2,y2,z2,s3,orb3,x3,y3,z3,s4,orb4,x4,y4,z4,s5,orb5,x5,y5,z5]
-        slabel= make_z_canonical(slabel)
+        slabel= gs.make_z_canonical(slabel)
         s1 = slabel[0]; orb1 = slabel[1]; x1 = slabel[2]; y1 = slabel[3]; z1 = slabel[4];
         s2 = slabel[5]; orb2 = slabel[6]; x2 = slabel[7]; y2 = slabel[8]; z2 = slabel[9];
         s3 = slabel[10]; orb3 = slabel[11]; x3 = slabel[12]; y3 = slabel[13]; z3 = slabel[14];
@@ -113,18 +113,18 @@ def get_d8d8L_state_indices(VS):
         s5 = slabel[20]; orb5 = slabel[21]; x5 = slabel[22]; y5 = slabel[23]; z5 = slabel[24];               
 
  
-        if not ((o1 in pam.Ni_Cu_orbs) and (o2 in pam.Ni_Cu_orbs) and (o3 in pam.Ni_Cu_orbs) and (o4 in pam.Ni_Cu_orbs) \
-                and (o5 in pam.O_orbs) and z1==z2==2 and z3==z4==z5==0):
+        if not ((orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) \
+                and (orb5 in pam.O_orbs) and z1==z2==2 and z3==z4==z5==0):
             continue 
             
-        if not ((x5==1 or x5==-1) and (y5==1 or y5==-1)):
+        if not ((x5==1 or x5==-1) or (y5==1 or y5==-1)):
             continue   
 
 
         # d9_{a1b1} singlet:
-        if  o1=='d3z2r2' and o2=='dx2y2' and o3=='d3z2r2' and o4=='dx2y2' :
-            a1b1_O_a1b1_state_indices.append(i); a1b1_O_a1b1_state_labels.append('$a1b1_a1b1L$')
-            print ("a1b1_a1b1L_state_indices", i, ", state: orb= ",s1,o1,x1, y1, z1,s2,o2,x2, y2, z2,s3,o3,x3, y3, z3,s4,o4,x4, y4, z4,s5,o5,x5, y5, z5)
+        if  orb1=='d3z2r2' and orb2=='dx2y2' and orb3=='d3z2r2' and orb4=='dx2y2' and s1=='up' and s2=='up' and s3=='dn' and s4=='dn' and s5=='up':
+            a1b1_a1b1L_state_indices.append(i);a1b1_a1b1L_state_labels.append('$a1b1_a1b1L$')
+            print ("a1b1_a1b1L_state_indices", i, ", state: orb= ",s1,orb1,x1, y1, z1,s2,orb2,x2, y2, z2,s3,orb3,x3, y3, z3,s4,orb4,x4, y4, z4,s5,orb5,x5, y5, z5)
     
 
     return a1b1_a1b1L_state_indices, a1b1_a1b1L_state_labels

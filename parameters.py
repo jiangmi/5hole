@@ -61,15 +61,15 @@ if Norb==8 or Norb==5:
 #     tpds = [0.01]
 
     # 29.5GPa:
-    tpds = np.linspace(0.3,0.3, num=1, endpoint=True) #[0.25]
+    tpds = np.linspace(0.1,0.1, num=1, endpoint=True) #[0.25]
 
     tpps = [0.55]
 
     # 29.5GPa:
     tpps = [0.35]
     
-    tapzds = np.linspace(0,4.2, num=1, endpoint=True)
-    tapzps = np.linspace(0, 0, num=1, endpoint=True)
+    tapzds = np.linspace(0.0,4.2, num=8, endpoint=True)
+    tapzps = np.linspace(0.37, 0.37, num=1, endpoint=True)
     tz_a1a1 = 0.028
 
     # 29.5GPa:
@@ -108,8 +108,8 @@ if_tz_exist = 2
     #if if_tz_exist = 1,tz exist in d orbits.
     #if if_tz_exist = 2,tz exist in d3z2r2 orbits.    
     
-wmin = -10; wmax = 30
-eta = 0.1
+wmin = 5; wmax = 25
+eta = 0.01
 Lanczos_maxiter = 600
 
 # restriction on variational space
@@ -121,16 +121,16 @@ if_print_VS_after_basis_change = 0
 
 all_A_d8910 = 'd9'  #  'd8' or  'd9' or  'd10' 'd8' means all A give d8,'d10' means 2/A give d8 and  2/A give d10 ,'d9'  means newly 2/3A give d9 and 2A gives d10 
 
-if_compute_Aw = 0
+if_compute_Aw = 1
 if if_compute_Aw==1:
     if_find_lowpeak = 0
     if if_find_lowpeak==1:
         peak_mode = 'lowest_peak' # 'lowest_peak' or 'highest_peak' or 'lowest_peak_intensity'
         if_write_lowpeak_ep_tpd = 1
-    if_write_Aw = 0
+    if_write_Aw =0
     if_savefig_Aw = 1
 
-if_get_ground_state = 1
+if_get_ground_state = 0
 if if_get_ground_state==1:
     # see issue https://github.com/scipy/scipy/issues/5612
     Neval = 10
@@ -167,7 +167,7 @@ print ("Obilayer_orbs = ",  Obilayer_orbs)
 orbs = Ni_Cu_orbs + O_orbs + Obilayer_orbs
 #assert(len(orbs)==Norb)
 
-Upps = [0]
+Upps = [4]
 Usss = [4]
 symmetries = ['1A1','3B1','3B1','1A2','3A2','1E','3E']
 print ("compute A(w) for symmetries = ",symmetries)
