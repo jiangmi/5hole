@@ -63,7 +63,7 @@ def compute_Aw(H, VS, w_vals, state_index, label_index, fig_name, fname):
     savefig(fig_name+fname+".pdf")
     print ("====================================")
     
-def compute_Aw1(H, VS, w_vals, state_index, label_index, fig_name, fname):
+def compute_Aw1(H, VS, w_vals, state_index, label_index, state_index2, label_index2, fig_name, fname):
     '''
     Added spectra for a set of states which share the same label
     '''
@@ -71,15 +71,27 @@ def compute_Aw1(H, VS, w_vals, state_index, label_index, fig_name, fname):
     clf()
     
     Aw = np.zeros(len(w_vals))
+    Aw2 = np.zeros(len(w_vals))    
     Nstate = len(state_index)
+    Nstate2 = len(state_index2)    
     for j in range(0,Nstate):
         index = state_index[j]
         
         Aw_tmp = np.zeros(len(w_vals))     
         Aw_tmp, w_peak, weight = getAw(H,index,VS,w_vals)
         Aw += Aw_tmp
+        
+    for k in range(0,Nstate2):
+        index2 = state_index2[k]
+        
+        Aw_tmp2 = np.zeros(len(w_vals))     
+        Aw_tmp2, w_peak2, weight2 = getAw(H,index2,VS,w_vals)
+        Aw2 += Aw_tmp2        
+        
                 
-    plt.plot(w_vals, Aw, Ms[0], linewidth=1, label=label_index[0])  
+    plt.plot(w_vals, Aw, Ms[0], linewidth=1, label=label_index[0] ,color='y')  
+    plt.plot(w_vals, Aw2, Ms[0], linewidth=1, label=label_index2[0] ,color='r')      
+    
 
     # write data into file for reusage
     if pam.if_write_Aw==1:

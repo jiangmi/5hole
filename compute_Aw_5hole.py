@@ -26,15 +26,16 @@ start_time = time.time()
 M_PI = math.pi
                   
 #####################################
-def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tpzd,tpzp,tz_a1a1,tz_b1b1,pds,pdp,pps,ppp,Upp,Uss,\
+def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tapzd,tapzp,tz_a1a1,tz_b1b1,pds,pdp,pps,ppp,Upp,Uss,\
                     d_Ni_double,d_Cu_double,p_double,apz_double,double_Ni_part,hole345_Ni_part, double_Cu_part,\
                     hole345_Cu_part, idx_Ni,idx_Cu, U_Ni, \
                     S_Ni_val, Sz_Ni_val, AorB_Ni_sym, \
                     U_Cu, S_Cu_val, Sz_Cu_val, AorB_Cu_sym):  
     if Norb==8 or Norb==5:
         fname = 'epCu'+str(epCu)+'epNi'+str(epNi)+'_tpd'+str(tpd)+'_tpp'+str(tpp) \
-                  +'_Mc'+str(Mc)+'_Norb'+str(Norb)+'_eta'+str(eta) +'_ANi'+str(ANi) \
-                  + '_ACu'+str(ACu) + '_B'+str(B) + '_C'+str(C) +'_tz_a1a1' +str(tz_a1a1)  +'_tz_b1b1' +str(tz_b1b1)                 
+                  +'_Mc'+str(Mc)+'_eta'+str(eta) \
+                  +'_tz_a1a1' +str(tz_a1a1)  +'_tz_b1b1' +str(tz_b1b1) +'_Upp'+str(Upp)\
+                  + '_Uss'+str(Uss) + '_tapzd'+str(tapzd)+ '_tapzp'+str(tapzp)
         flowpeak = 'Norb'+str(Norb)+'_tpp'+str(tpp)+'_Mc'+str(Mc)+'_eta'+str(eta)
     elif Norb==10 or Norb==11 or Norb==12:
         fname = 'epCu'+str(epCu)+'epNi'+str(epNi)+'_pdp'+str(pdp)+'_pps'+str(pps)+'_ppp'+str(ppp) \
@@ -84,19 +85,20 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tpzd,tpzp,tz_a1a1,tz_b1b
     
 
     if Norb==5 or Norb==6 or Norb==10 or Norb==11 or Norb==12:     
-        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,p_double,apz_double,double_Ni_part, idx_Ni, hole345_Ni_part,  \
-                                                      S_Ni_val, Sz_Ni_val,AorB_Ni_sym, ACu, ANi, Upp, Uss)
-        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,p_double,apz_double,double_Cu_part, idx_Cu, hole345_Cu_part, \
-                                                      S_Cu_val, Sz_Cu_val,AorB_Cu_sym, ACu, ANi, Upp, Uss)        
+        Hint_Ni = ham.create_interaction_matrix_ALL_syms(VS,d_Ni_double,double_Ni_part, idx_Ni, hole345_Ni_part,  \
+                                                      S_Ni_val, Sz_Ni_val,AorB_Ni_sym, ACu, ANi)
+        Hint_Cu = ham.create_interaction_matrix_ALL_syms(VS,d_Cu_double,double_Cu_part, idx_Cu, hole345_Cu_part, \
+                                                      S_Cu_val, Sz_Cu_val,AorB_Cu_sym, ACu, ANi)
+        Hint_po = ham.create_interaction_matrix_po(VS,p_double,apz_double, Upp, Uss)       
         
         if pam.if_H0_rotate_byU==1:
             H_Ni = H0_Ni_new + Hint_Ni
             
             # continue rotate the basis for setting Cu layer's interaction (d_Cu_double)
             H0_Cu_new = U_Cu_d.dot(H_Ni.dot(U_Cu)) 
-            H = H0_Cu_new + Hint_Cu
+            H = H0_Cu_new + Hint_Cu+ Hint_po
         else:
-            H = H0 + Hint_Ni + Hint_Cu
+            H = H0 + Hint_Ni + Hint_Cu+ Hint_po
 
         print("interaction %s seconds ---" % (time.time() - start_time))               
 #         if pam.basis_change_type=='all_states':
@@ -130,11 +132,12 @@ def compute_Aw_main(ANi,ACu,epCu,epNi,epbilayer,tpd,tpp,tpzd,tpzp,tz_a1a1,tz_b1b
 #             fig.compute_Aw_d8_sym(H, VS, d_double, S_val, Sz_val, AorB_sym, A, w_vals, "Aw_d8_sym_", fname)
 
             #compute d9Ld9L
-            d9Ld9L_a1L_b1L_state_indices, d9Ld9L_a1L_b1L_state_labels, \
-                    = getstate.get_d9Ld9L_state_indices(VS)
-            fig.compute_Aw1(H, VS, w_vals,  d9Ld9L_a1L_b1L_state_indices, d9Ld9L_a1L_b1L_state_labels, "Aw_d9Ld9L_a1L_b1L__", fname)
+            a1b1_O_a1b1_state_indices, a1b1_O_a1b1_state_labels, \
+                    = getstate.get_d8Od8_state_indices(VS)
            
-        
+            a1b1_a1b1L_state_indices, a1b1_a1b1L_state_labels, \
+                    = getstate.get_d8d8L_state_indices(VS)
+            fig.compute_Aw1(H, VS, w_vals,  a1b1_a1b1L_state_indices,  a1b1_a1b1L_state_labels,  a1b1_O_a1b1_state_indices,  a1b1_O_a1b1_state_labels,"Aw_5hole_", fname)        
 #             #compute d9d9L2        
 #             d9d9L2_a1_b1L2_state_indices, d9d9L2_a1_b1L2_state_labels, \
 #                     = getstate.get_d9d9L2_state_indices(VS)
@@ -239,3 +242,4 @@ if __name__ == '__main__':
                                                                         S_Cu_val, Sz_Cu_val, AorB_Cu_sym)  
 
                         
+    print("--- %s seconds ---" % (time.time() - start_time))

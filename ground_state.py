@@ -175,7 +175,8 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
     wgt_d9Ld10L3= np.zeros(40)        
     wgt_d9L2d10L2= np.zeros(40)          
     wgt_d9L3d10L= np.zeros(40)   
-    wgt_d9L4d10= np.zeros(40)  
+    wgt_d9L4d10= np.zeros(40) 
+    wgt_d7= np.zeros(40) 
     wgt_a1= np.zeros(10)   
     wgt_b1= np.zeros(10)       
     wgt_L= np.zeros(10) 
@@ -965,9 +966,41 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
                 if bonding==1:
                     wgt_dddds[77]+=abs(vecs[istate,k])**2 
                 if bonding==-1:
-                    wgt_dddds[78]+=abs(vecs[istate,k])**2                     
+                    wgt_dddds[78]+=abs(vecs[istate,k])**2    
                     
-
+                    
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.Ni_Cu_orbs) and z1==z2==z3==2 and z4==z5==0: 
+                wgt_d7[0]+=abs(vecs[istate,k])**2                 
+                if orb1==orb2==orb4=='d3z2r2' and orb3==orb5=='dx2y2':
+                    wgt_d7[2]+=abs(vecs[istate,k])**2      
+                if orb1==orb4=='d3z2r2' and orb2==orb3==orb5=='dx2y2':
+                    wgt_d7[3]+=abs(vecs[istate,k])**2                      
+                if orb1==orb2==orb3==orb4==orb5=='dx2y2':
+                    wgt_d7[4]+=abs(vecs[istate,k])**2                 
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.Ni_Cu_orbs) and z1==z2==2 and z3==z4==z5==0: 
+                wgt_d7[1]+=abs(vecs[istate,k])**2
+                if orb1==orb3==orb4=='d3z2r2' and orb2==orb5=='dx2y2':
+                    wgt_d7[5]+=abs(vecs[istate,k])**2      
+                if orb1==orb3=='d3z2r2' and orb2==orb4==orb5=='dx2y2':
+                    wgt_d7[6]+=abs(vecs[istate,k])**2                      
+                if orb1==orb2==orb3==orb4==orb5=='dx2y2':
+                    wgt_d7[7]+=abs(vecs[istate,k])**2                  
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.O_orbs) and z1==z2==z3==2 and z4==z5==0:                 
+                wgt_d7[8]+=abs(vecs[istate,k])**2   
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.O_orbs) and z1==z5==2 and z2==z3==z4==0:                 
+                wgt_d7[9]+=abs(vecs[istate,k])**2                   
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.Obilayer_orbs) and z1==z2==z3==2 and z4==z5==0:                 
+                wgt_d7[10]+=abs(vecs[istate,k])**2   
+                
+            elif (orb1 in pam.Ni_Cu_orbs) and (orb2 in pam.Ni_Cu_orbs) and  (orb3 in pam.Ni_Cu_orbs) and (orb4 in pam.Ni_Cu_orbs) and (orb5 in pam.Obilayer_orbs) and z1==z5==2 and z2==z3==z4==0:                 
+                wgt_d7[11]+=abs(vecs[istate,k])**2  
+                
+                
+                
             sumweight=sumweight+abs(vecs[istate,k])**2
 
     print ('sumweight=',sumweight/number)
@@ -980,7 +1013,8 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
        
     print ('d9L3d9=',wgt_d9L3d9[0]/number+wgt_d9d9L3[0]/number,'  bonding0=',wgt_d9L3d9[36]/number+wgt_d9d9L3[36]/number,'  bonding1=',wgt_d9L3d9[37]/number+wgt_d9d9L3[37]/number,'  bonding-1=',wgt_d9L3d9[38]/number+wgt_d9d9L3[38]/number) 
     print ('d9L2d9L=',wgt_d9L2d9L[0]/number+wgt_d9Ld9L2[0]/number,'  bonding0=',wgt_d9L2d9L[36]/number+wgt_d9Ld9L2[36]/number,'  bonding1=',wgt_d9L2d9L[37]/number+wgt_d9Ld9L2[37]/number,'  bonding-1=',wgt_d9L2d9L[38]/number+wgt_d9Ld9L2[38]/number)         
-
+   
+    
 #     print ('d8L3d10=',wgt_d8L3d10[0]/number,'  bonding0=',wgt_d8L3d10[36]/number,'  bonding1=',wgt_d8L3d10[37]/number,'  bonding-1=',wgt_d8L3d10[38]/number) 
 #     print ('d8L2d10L=',wgt_d8L2d10L[0]/number,'  bonding0=',wgt_d8L2d10L[36]/number,'  bonding1=',wgt_d8L2d10L[37]/number,'  bonding-1=',wgt_d8L2d10L[38]/number)         
 #     print ('d8Ld10L2=',wgt_d8Ld10L2[0]/number,'  bonding0=',wgt_d8Ld10L2[36]/number,'  bonding1=',wgt_d8Ld10L2[37]/number,'  bonding-1=',wgt_d8Ld10L2[38]/number)         
@@ -998,7 +1032,11 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
     print ('d8-O-L2 + d8L-O-L + d8L2-O + d9-O-d9L2 + d9L-O-d9L=',wgt_dds[2]/number,'  bonding0=',wgt_dds[76]/number,'  bonding1=',wgt_dds[77]/number,'  bonding-1=',wgt_dds[78]/number)  
     print ('d8-O2-d9=',wgt_ddds[1]/number,'  bonding0=',wgt_ddds[73]/number,'  bonding1=',wgt_ddds[74]/number,'  bonding-1=',wgt_ddds[75]/number) 
     print ('d8L-O-d9 + d8-O-d9L=',wgt_ddds[2]/number,'  bonding0=',wgt_ddds[76]/number,'  bonding1=',wgt_ddds[77]/number,'  bonding-1=',wgt_ddds[78]/number)  
-    print ('d8-O-d8=',wgt_dddds[0]/number,'  bonding0=',wgt_dddds[76]/number,'  bonding1=',wgt_dddds[77]/number,'  bonding-1=',wgt_dddds[78]/number)   
+    print ('d8-O-d8=',wgt_dddds[0]/number,'  bonding0=',wgt_dddds[76]/number,'  bonding1=',wgt_dddds[77]/number,'  bonding-1=',wgt_dddds[78]/number)  
+    print ('d7d8=',wgt_d7[0]/number+wgt_d7[1]/number)
+    print ('d7d9L=',wgt_d7[8]/number+wgt_d7[9]/number)   
+    print ('d7d9O=',wgt_d7[10]/number+wgt_d7[11]/number)        
+    
 
     print ('test[0]=',test[0]/number)     
     print ('test[1]=',test[1]/number)        
@@ -1941,8 +1979,27 @@ def get_ground_state(matrix, VS, S_Ni_val, Sz_Ni_val, S_Cu_val, Sz_Cu_val,bondin
     txt.write(str(wgt_dddds[78]/number)+'\n')
     txt.close()          
     
+    txt=open('./data/d7d8','a')                                  
+    txt.write(str(wgt_d7[0]/number+wgt_d7[1]/number)+'\n')
+    txt.close()          
+    txt=open('./data/d7d8_a1a1b1_a1b1','a')                                  
+    txt.write(str(wgt_d7[2]/number+wgt_d7[5]/number)+'\n')
+    txt.close()             
+    txt=open('./data/d7d8_a1b1b1_a1b1','a')                                  
+    txt.write(str(wgt_d7[3]/number+wgt_d7[6]/number)+'\n')
+    txt.close()        
+    txt=open('./data/d7d8_b1b1b1_b1b1','a')                                  
+    txt.write(str(wgt_d7[4]/number+wgt_d7[7]/number)+'\n')
+    txt.close()            
+    txt=open('./data/d7d9L','a')                                  
+    txt.write(str(wgt_d7[8]/number+wgt_d7[9]/number)+'\n')
+    txt.close()         
+    txt=open('./data/d7d9O','a')                                  
+    txt.write(str(wgt_d7[10]/number+wgt_d7[11]/number)+'\n')
+    txt.close()             
     
-
+    
+    
     txt=open('./data/number','a')                                  
     txt.write(str(number)+'\n')
     txt.close() 

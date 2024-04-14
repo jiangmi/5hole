@@ -1463,7 +1463,10 @@ def create_edep_diag_matrix(VS,ANi,ACu,epNi,epCu,epbilayer):
                 diag_el +=2*ANi
             if Cu_i == 0:
                 diag_el +=2*ACu       
-                                
+            if Ni_i == 3:
+                diag_el +=3*ANi/2 
+            if Cu_i == 3:
+                diag_el +=3*ACu/2                                   
                 
 
         data.append(diag_el); row.append(i); col.append(i)

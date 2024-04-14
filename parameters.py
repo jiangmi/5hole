@@ -24,6 +24,12 @@ edCu = {'d3z2r2': 0.095,\
         'dxz'   : 0.94,\
         'dyz'   : 0.94}
 
+edCu = {'d3z2r2': 0,\
+        'dx2y2' : 0,\
+        'dxy'   : 0,\
+        'dxz'   : 0,\
+        'dyz'   : 0}
+
 
 edNi = edCu
 
@@ -167,8 +173,8 @@ print ("Obilayer_orbs = ",  Obilayer_orbs)
 orbs = Ni_Cu_orbs + O_orbs + Obilayer_orbs
 #assert(len(orbs)==Norb)
 
-Upps = [4]
-Usss = [4]
+Upps = [0]
+Usss = [0]
 symmetries = ['1A1','3B1','3B1','1A2','3A2','1E','3E']
 print ("compute A(w) for symmetries = ",symmetries)
 

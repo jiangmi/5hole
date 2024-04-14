@@ -64,7 +64,7 @@ def get_d8Od8_state_indices(VS):
 
         # d9_{a1b1} singlet:
         if  orb1=='d3z2r2' and orb2=='dx2y2' and orb3=='d3z2r2' and orb4=='dx2y2' and (s1=='up' and s2=='up' and s3=='up' and s4=='dn' and s5=='dn'):
-            a1b1_O_a1b1_state_indices.append(i); a1b1_O_a1b1_state_labels.append('$a1b1_O_a1b1$')
+            a1b1_O_a1b1_state_indices.append(i); a1b1_O_a1b1_state_labels.append('$a1b1Oa1b1$')
             print ("a1b1_O_a1b1_state_indices", i, ", state: ",s1,orb1,x1, y1, z1,s2,orb2,x2, y2, z2,s3,orb3,x3, y3, z3,s4,orb4,x4, y4, z4,s5,orb5,x5, y5, z5)
     
 
