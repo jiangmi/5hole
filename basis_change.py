@@ -187,7 +187,7 @@ def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_par
                     j, ph = find_singlet_triplet_partner_d_double(VS, double_part[i], idx[i], hole345_part[i])
 
                     
-                    if not vs.check_Pauli(slabel):
+                    if j==None:
                         continue
                     # append matrix elements for singlet states
                     # convention: original state col i stores singlet and 
