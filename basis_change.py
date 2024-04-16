@@ -70,7 +70,7 @@ def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_par
     # store index of partner state in d_double to avoid double counting
     # otherwise, when arriving at i's partner j, its partner would be i
     count_list = []
-    count_d = []    
+ 
     # denote if the new state is singlet (0) or triplet (1)
     S_d8_val  = np.zeros(VS.dim, dtype=int)
     Sz_d8_val = np.zeros(VS.dim, dtype=int)
@@ -83,16 +83,14 @@ def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_par
             data.append(np.sqrt(2.0)); row.append(i); col.append(i)
         
     for i, double_id in enumerate(d_double):
-        if double_id in count_d:
-            continue           
-        print (double_id)
+
         s1 = double_part[i][0]
         o1 = double_part[i][1]
         s2 = double_part[i][5]
         o2 = double_part[i][6]          
         dpos = double_part[i][2:5]
    
-        count_d.append(double_id)
+
 
 
         if s1==s2:
@@ -186,9 +184,6 @@ def create_singlet_triplet_basis_change_matrix_d_double(VS, d_double, double_par
                 if double_id not in count_list:
                     j, ph = find_singlet_triplet_partner_d_double(VS, double_part[i], idx[i], hole345_part[i])
 
-                    
-                    if j==None:
-                        continue
                     # append matrix elements for singlet states
                     # convention: original state col i stores singlet and 
                     #             partner state col j stores triplet
